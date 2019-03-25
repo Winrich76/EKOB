@@ -1,0 +1,26 @@
+{% load static %}
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Elektroniczna Książka Obiektu</title>
+    <link rel="stylesheet" href="{% static "css/style.css" %}">
+    <link href='http://fonts.googleapis.com/css?family=Headland+One&subset=latin,latin-ext' rel='stylesheet' type='text/css'>
+</head>
+<body>
+
+<div class="centerIndexBox">
+    <div align="center"><p>Elektroniczna Książka Obiektu</p></div>
+    <div>
+        <img class="" src="{% static "img/index.jpg" %}">
+    </div>
+    <div class="centerButton">
+        <a href="{% url 'list_surveys' %}"><button class="blue">wejdź</button></a>
+        <div style="clear:both"></div>
+    </div>
+
+
+</div>
+
+</body>
+</html>

@@ -1,0 +1,20 @@
+{% extends 'base.html' %}
+{% load static %}
+
+
+{% block base %}
+    <div class="margin_box">
+
+          <div class="outside_box">
+              {% block content %}
+              {% endblock %}
+          </div>
+    </div>
+{% endblock %}
+
+
+
+
+{% block content_js_script %}
+    <script src={% static "js/base_one.js" %} ></script>
+{% endblock %}

@@ -1,0 +1,25 @@
+
+{% extends 'base-one_column.html' %}
+{% load static %}
+{% load widget_tweaks %}
+
+{% block content %}
+     <div class="boxH"><h2>Kasowanie danych</h2></div>
+    <div class="bigCenter_box" >
+        <form method="post">{% csrf_token %}
+
+            <h3>Kasujesz przegląd: {{ object.get_kind_display}} </h3><h3>Dla budynku: {{ object.building.name  }}</h3>
+
+             <button type="submit">potwierdź</button>
+        </form>
+
+
+        <form method="get" action="../..">
+            <div>
+                <button type="submit" class="red">anuluj</button>
+            </div>
+            <div style="clear:both"></div>
+        </form>
+    </div>
+{% endblock %}
+

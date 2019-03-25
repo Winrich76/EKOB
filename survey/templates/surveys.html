@@ -1,0 +1,172 @@
+{% extends 'base-main.html' %}
+{% load static %}
+{% load widget_tweaks %}
+
+
+{% block content_left %}
+
+    <div  style="overflow-x:auto;">
+        {#        ============== start filter==========#}
+        <div class="filter_box">
+            <div class="boxH"><h3>Filtrowanie danych</h3></div>
+            <div class="filter_boxIn">
+                <form method="get">
+                    <table>
+                        <tr>
+                            <td class="filter">{{ filter.form.building.label_tag }}</td>
+                            <td class="filter">{% render_field filter.form.building %}</td>
+                            <td class="filter">{{ filter.form.kind.label_tag }}</td>
+                            <td class="filter">{% render_field filter.form.kind %}</td>
+
+                        </tr>
+                        <tr>
+                            <td class="filter">{{ filter.form.is_open.label_tag }}</td>
+                            <td class="filter">{% render_field filter.form.is_open %}</td>
+                            <td class="filter">tylko nieaktualne:</td>
+                            <td class="filter"><label class="container"><input type="checkbox" id="check_valid" >  <span class="checkmark"></span></label></td>
+
+                        </tr>
+                    </table>
+
+                    <div class="invisible">
+                        {{ filter.form.valid_date.label_tag }}
+                        {% render_field filter.form.valid_date %}
+                    </div>
+
+                    <div>
+                         <button type="submit">filtruj</button>
+                    </div>
+                    <div style="clear:both"></div>
+                </form>
+            </div>
+        </div>
+
+{#    ===============START TABLE=================#}
+
+
+        <div>
+              <table class="maintable">
+              <thead>
+                  <tr id="head_details">
+                      <th>Budynek</th>
+                      <th>Przegląd</th>
+                      <th>Data</th>
+                      <th>Ważny do</th>
+                      <th class="invisible">Wykonawca</th>
+                       <th>Status</th>
+                      <th class="invisible">Zalecenie</th>
+                       <th class="invisible">Plik PDF</th>
+                  </tr>
+              </thead>
+                  <tbody>
+
+                   {% for survey in paginator %}
+                      <tr class="details change_tr">
+                          <td id={{ survey.id }}>{{ survey.building.name }}</td>
+                          <td>{{ survey.get_kind_display}}</td>
+                          <td>{{ survey.survey_date }}</td>
+                          <td>{{ survey.valid_date }}</td>
+                          <td class="invisible">{{ survey.contractor.name }}</td>
+
+                      {% if survey.is_open and survey.valid_date < today.date %}
+                          <td class="outdate"> bieżący NIEAKTUALNY </td>
+                      {% elif survey.is_open and survey.valid_date >= today.date %}
+                          <td class="is_ok"> bieżący </td>
+                      {% else  %}
+                          <td>archiwalny</td>
+                      {% endif %}
+
+                          <td class="invisible">{{ survey.description }}</td>
+                      {% if survey.pdf %}
+                          <td class="invisible"><a href="{{ survey.pdf }}"><button class="icon">PDF</button></a></td>
+                      {% else %}
+                          <td class="invisible"></td>
+                      {% endif %}
+                      </tr>
+                  {% endfor %}
+
+                  </tbody>
+              </table>
+        </div>
+    </div>
+{#===================Paginator#}
+
+<div class="pagination">
+
+    <span class="step-links">
+        {% if paginator.has_previous %}
+            <a href="?page={{ paginator.previous_page_number }}">&lt poprzednia | </a>
+        {% endif %}
+
+            {%  for p in paginator.paginator.page_range %}
+
+                <span>
+                    <a href="?page={{ p }}"> {{ p  }}| </a>
+                </span>
+            {%  endfor %}
+
+        {% if paginator.has_next %}
+            <a href="?page={{ paginator.next_page_number }}">następna &gt</a>
+        {% endif %}
+    </span>
+</div>
+
+
+
+
+{% endblock %}
+{#========================Start Details Table}#}
+{% block content_right %}
+    <div class="boxH"><h3>Szczegóły przeglądu</h3></div>
+    <div id="info_div" class="invisible">
+
+        <table>
+            <thead>
+            <tr>
+                <td class="top" colspan="2"></td>
+
+            </tr>
+            </thead>
+            <tbody id="info_table">
+
+            </tbody>
+        </table>
+        <div class="boxH"><h3>Zestawienie wykonania zaleceń z przegladu</h3></div>
+        <div>
+            <table>
+                <thead>
+                <tr>
+                    <th style="width: 25%">Data</th>
+                    <th style="width: auto"> Zakres prac</th>
+                </tr>
+                </thead>
+                <tbody>
+                    {% for execut in execution %}
+                        <tr data-id={{ execut.survey.id }} class="data_id">
+
+                            <td style="width: 25%"> {{ execut.date }}</td>
+                            <td style="width: auto"> {{ execut.description }} </td>
+
+                        </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
+        <div>
+            <form method="get" action="">
+                <button type="submit" id="update" >edytuj</button>
+            </form>
+             <form method="get" action="">
+                <button type="submit" id="execution" >dodaj wykonanie</button>
+            </form>
+             <form method="get" action="">
+                <button class="red" type="submit" id="delete" >kasuj</button>
+            </form>
+        </div>
+        <p style="clear:both"><br></p>
+    </div>
+{% endblock %}
+{% block content_js_script %}
+    <script src={% static "js/surveys.js" %} ></script>
+{% endblock %}
+

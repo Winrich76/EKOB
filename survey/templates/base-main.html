@@ -1,0 +1,28 @@
+{% extends 'base.html' %}
+{% load static %}
+
+
+ {% block base %}
+
+
+    <div class="row">
+      <div class="column left">
+          <div class="outside_box">
+              {% block content_left %}
+              {% endblock %}
+          </div>
+      </div>
+
+      <div class="column right">
+          <div class="outside_box">
+              {% block content_right %}
+              {% endblock %}
+          </div>
+      </div>
+    </div>
+
+
+{% endblock %}
+
+{% block content_js_script %}
+{% endblock %}

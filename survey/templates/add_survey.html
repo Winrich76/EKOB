@@ -1,0 +1,58 @@
+{% extends 'base-one_column.html' %}
+{% load static %}
+{% load widget_tweaks %}
+
+{% block content %}
+<div class="center_box">
+    <div class="boxH"><h2>Dodaj nowy przegląd</h2></div>
+        <form action="" method="post" enctype="multipart/form-data">
+            {% csrf_token %}
+            {{ form.non_field_errors }}
+            {% for hidden_field in form.hidden_fields %}
+                {{ hidden_field.errors }}
+                {{ hidden_field }}
+            {% endfor %}
+
+          <table>
+              <tr>
+                  <td>{{ form.building.label_tag }}</td>
+                  <td colspan="2"> {{ form.building.errors }}{{ form.building }}</td>
+
+              </tr>
+              <tr>
+                  <td>{{ form.kind.label_tag }}</td>
+                  <td colspan="2">{{ form.kind.errors }}{{ form.kind }}</td>
+
+              </tr>
+              <tr>
+                  <td>{{ form.survey_date.label_tag }}</td>
+                  <td colspan="2">{{ form.survey_date.errors }}{{ form.survey_date }}</td>
+
+              </tr>
+              <tr>
+                  <td>{{ form.description.label_tag }}</td>
+                  <td colspan="2">{{ form.description.errors }}{{ form.description }}</td>
+
+              </tr>
+              <tr>
+                  <td>{{ form.pdf.label_tag }}</td>
+                  <td colspan="2">{{ form.pdf.errors }}{{ form.pdf }}</td>
+              </tr>
+              <tr>
+                  <td>{{ form.contractor.label_tag }}</td>
+                    <td class="maxWidth">{{ form.contractor.errors }}{{ form.contractor }} {{ form.contractor.help_text }} </td>
+                  <td ><a href="{% url 'new_contractor' %}"> <button type="submit" >Utwórz</button></a></td>
+
+              </tr>
+
+          </table>
+        <button type="submit" >Dodaj</button>
+        </form>
+    <div style="clear:both"></div>
+    </div>
+
+
+
+{% endblock %}
+
+

@@ -1,0 +1,44 @@
+{% load static %}
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Elektroniczna Książka Obiektu</title>
+    <link rel="stylesheet" href="{% static "css/style.css" %}">
+    <link href='http://fonts.googleapis.com/css?family=Lato&subset=latin,latin-ext' rel='stylesheet' type='text/css'>
+</head>
+<body>
+
+    <div class="header">
+    </div>
+
+    <div class="topnav">
+          <ul>
+              <li><a href="#">Budynki</a></li>
+
+              <li class="dropdown">
+                    <a href="#" class="dropbtn">Przeglądy</a>
+                        <div class="dropdown-content">
+                            <a href="/surveys/">Pokaż wszystkie</a>
+                            <a href="/addsurvey/">Dodaj przegląd</a>
+                            <a href="/addcontractor/">Dodaj wykonawcę</a>
+                            <a href="#">Zaplanuj</a>
+                        </div>
+              </li>
+              <li><a href="#">Remonty</a></li>
+              <li><a href="#">Dokumentacja</a></li>
+              <li><a href="#">Home</a></li>
+          </ul>
+    </div>
+
+
+    {% block base %}
+    {% endblock %}
+
+{#<div class="footer">#}
+{#        <p></p>#}
+{#    </div>#}
+{% block content_js_script %}
+{% endblock %}
+</body>
+</html>

@@ -1,0 +1,29 @@
+{% extends 'base-one_column.html' %}
+{% load static %}
+{% load widget_tweaks %}
+
+{% block content %}
+
+
+    <table>
+    <tr>
+        <th>Nazwa</th>
+        <th>Branża</th>
+        <th>Telefon</th>
+        <th>Mail</th>
+    </tr>
+        {% for contractor in contractors %}
+    <tr>
+        <td>{{ contractor.name }} </td>
+        <td>{{ contractor.get_industry_display}} </td>
+        <td> {{ contractor.phone }}</td>
+        <td> {{ contractor.mail }}</td>
+    </tr>
+
+    {% endfor %}
+
+
+    </table>
+
+
+{% endblock %}
