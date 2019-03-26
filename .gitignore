@@ -14,5 +14,10 @@ survey/templates/test.html
 survey/templates/test1.html
 survey/static/dane.txt
 
+EKOB/settings.py
+EKOB/__init__.py
+EKOB/wsgi.py
+
+
 
 

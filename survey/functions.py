@@ -25,6 +25,7 @@ def validity_date(date_s, valid):
     return new_date_survey
 
 
+
 def length_valid(i_kind):
     if 1 <= i_kind < 10: return 6
     if 10 <= i_kind < 20: return 12
