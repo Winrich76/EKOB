@@ -25,8 +25,7 @@ class AddSurveyForm(forms.Form):
     contractor = ContractorsChoiceField(label="wykonawca", queryset=Contractors.objects.all(),
                                         widget=forms.Select(attrs={'class': 'formIn'}),
                                         help_text="  wybierz wykonawcę z listy lub utwórz nowego:")
-    pdf=forms.FileField(label="plik .pdf", required=False)
-
+    pdf = forms.FileField(label="plik .pdf", required=False)
 
 
 class AddContractorsForm(forms.Form):
@@ -59,7 +58,7 @@ class AddExecutionForm(forms.Form):
         if date < survey.survey_date:
             raise ValidationError("Wpisana data protokołu naprawy jest wcześniejsza niż data przeglądu")
         elif date > today:
-            raise ValidationError("Data protokołu naprawy jest jest później niż dzisiaj")
+            raise ValidationError("Data protokołu naprawy jeszcze nie nastąpiła")
         return cleaned_data
 
 
@@ -67,3 +66,27 @@ class PdfModelForm(forms.ModelForm):
     class Meta:
         model = PdfFile
         fields = ['name', 'pdf']
+
+
+class LoginForm(forms.Form):
+    username = forms.CharField(label="Nazwa użytkownika")
+    password = forms.CharField(label="Hasło", widget=forms.PasswordInput)
+
+class RegistrationForm(forms.Form):
+    username=forms.CharField(label="Nazwa użytkownika")
+    password = forms.CharField(label="Password", widget=forms.PasswordInput)
+    email=forms.CharField(label="adres e-mail", widget=forms.EmailInput)
+
+
+
+SCOPE_SCHEDULE=(
+
+    (1, "kwartał"),
+    (2, "koniec roku"),
+    (3, "przyszły rok")
+)
+
+
+class ScheduleForm(forms.Form):
+    scope=forms.ChoiceField(choices=SCOPE_SCHEDULE)
+    building=BuildingChoiceField(queryset=Buildings.objects.all())

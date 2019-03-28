@@ -1,0 +1,37 @@
+{% extends 'base-one_column.html' %}
+{% load static %}
+{% load widget_tweaks %}
+
+{% block content %}
+
+    <form method="get">
+    <table>
+        {{ form}}
+    </table>
+    <button>Filtruj</button>
+    </form>
+    <div style="margin: 10px"></div>
+    <p>data zakresu {{ schedule_date }}</p>
+    <table>
+        <tr>
+            <th>Ważny do</th>
+            <th>Budynek</th>
+            <th>Przegląd</th>
+            <th>Data Przeglądu</th>
+            <th>Status</th>
+        </tr>
+
+        {% for survey in surveys %}
+            <tr>
+                <td>{{ survey.valid_date }}</td>
+                <td>{{ survey.building }}</td>
+                <td>{{ survey.get_kind_display }}</td>
+                <td>{{ survey.survey_date }}</td>
+                <td>{{ survey.is_open }}</td>
+
+            </tr>
+        {% endfor %}
+
+    </table>
+
+{% endblock %}

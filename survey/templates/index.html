@@ -15,11 +15,21 @@
         <img class="" src="{% static "img/index.jpg" %}">
     </div>
     <div class="centerButton">
-        <a href="{% url 'list_surveys' %}"><button class="blue">wejdź</button></a>
+        <a href="{% url 'registration' %}"><button class="blue">zarejestruj</button></a>
         <div style="clear:both"></div>
     </div>
 
 
+    <div style="font-size: 12px">
+         <form  method="post">
+             <table>
+                 {% csrf_token %}
+                 {{ form.as_p}}
+             </table>
+          <button class="blue">zaloguj</button>
+        </form>
+        {{ msg }}
+    </div>
 </div>
 
 </body>
