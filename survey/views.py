@@ -31,8 +31,8 @@ class AddSurveyView(View):
 
     def post(self, request):
         form = AddSurveyForm(request.POST, request.FILES)
-        del (request.session["contr"])
         if form.is_valid():
+            del (request.session["contr"])
             building = form.cleaned_data['building']
             kind = form.cleaned_data['kind']
             description = form.cleaned_data['description']
@@ -48,8 +48,8 @@ class AddSurveyView(View):
                                   contractor=contractor, pdf=pdf)
 
             return HttpResponseRedirect('/surveys')
-
-        return render(request, 'add_elements_surfey.html', {"form": form})
+        else:
+            return render(request, 'add_survey.html', {"form": form})
 
 
 class AddBuildingView(View):
@@ -141,6 +141,7 @@ class ScheduleView(View):
         scope = request.GET.get('scope')
         schedule_date = ""
         form = ScheduleForm(initial={"building": building, "scope": scope})
+        today = datetime.date.today()
 
 
 
@@ -148,7 +149,6 @@ class ScheduleView(View):
             if not building:
                 building = [b.id for b in (Buildings.objects.all())]
 
-            today = datetime.date.today()
             month = today.month
             year = today.year
             if int(scope) == 1:
@@ -178,14 +178,25 @@ class ScheduleView(View):
         else:
             surveys = Survey.objects.filter(is_open="True").order_by("valid_date")
 
-        surveys_message=[(survey.name, survey.get_kind_display()) for survey in surveys]
-        form_mail = SendMailForm(initial={'message': surveys_message, "subject":"zlecenie przeglądu"})
+        surveys_message=[[survey.building, survey.get_kind_display(), survey.valid_date] for survey in surveys]
+        text="Zlecam następujące przeglądy:\n"
+        for i in surveys_message:
+            if i[2]<today:
+                i[2]="pilne !!!"
+            text+=("przegląd: {}, dla budynku: {}, w terminie do: {} \n".format(i[1], i[0], i[2]))
+
+
+        form_mail = SendMailForm(initial={'message': text, "subject":"zlecenie przeglądu"})
 
         return render(request, "schedule.html", {"form": form, "surveys": surveys, "schedule_date": schedule_date, "form_mail":form_mail})
 
     # ===============email
     def post(self, request):
+
         form_mail = SendMailForm(request.POST)
+        surveys = Survey.objects.filter(is_open="True").order_by("valid_date")
+        form = ScheduleForm()
+
         if form_mail.is_valid():
             subject = form_mail.cleaned_data['subject']
             message = form_mail.cleaned_data['message']
@@ -195,13 +206,12 @@ class ScheduleView(View):
                 message,
                 'ekob_info@wp.pl',
                 [address.mail],
-
             )
-            return HttpResponse('poszło ok')
+            return HttpResponseRedirect('/surveys')
+        else:
 
-
-
-
+            return render(request, "schedule.html",
+                          {"form": form, "surveys": surveys, "form_mail": form_mail})
 
 
 class UpdateSurvey(UpdateView):

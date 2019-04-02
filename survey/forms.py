@@ -94,8 +94,13 @@ class ContractorsChoiceMailField(forms.ModelChoiceField):
     def label_from_instance(self, obj):
         return obj.mail
 
+
+class ContractorsChoiceMailField(forms.ModelChoiceField):
+    def label_from_instance(self, obj):
+        return ("{} ----  {}".format(obj.name, obj.mail))
+
 class SendMailForm(forms.Form):
-    address = ContractorsChoiceField(queryset=Contractors.objects.all())
-    subject=forms.CharField()
-    message=forms.CharField(widget=forms.Textarea)
+    address = ContractorsChoiceMailField(queryset=Contractors.objects.exclude(mail=''), label="Wykonawca")
+    subject=forms.CharField(label="Tytuł")
+    message=forms.CharField(widget=forms.Textarea, label="Treść zlecenia")
 
