@@ -4,19 +4,21 @@ from calendar import monthrange
 from django.contrib.auth import authenticate, login, logout
 from django.contrib.auth.mixins import PermissionRequiredMixin, LoginRequiredMixin
 from django.contrib.auth.models import User
+from django.core.mail import send_mail, BadHeaderError
 from django.core.paginator import Paginator, PageNotAnInteger, EmptyPage
+from django.db.models import Q
 from django.http import HttpResponse, HttpResponseRedirect
 from django.shortcuts import render
 from django.core.exceptions import ValidationError
 from django.urls import reverse_lazy
 from django.views import View
-from django.views.generic import CreateView, UpdateView, DeleteView
+from django.views.generic import CreateView, UpdateView, DeleteView, FormView
 import datetime
 from django.http import FileResponse
 
 from survey.filters import SurveyFilter
 from survey.forms import AddSurveyForm, AddContractorsForm, AddExecutionForm, PdfModelForm, LoginForm, RegistrationForm, \
-    ScheduleForm
+    ScheduleForm, SendMailForm
 from survey.functions import validity_date, length_valid, check_open_survey
 from survey.models import Buildings, Survey, Contractors, Execution, PdfFile
 
@@ -104,10 +106,9 @@ class AddExecutionView(View):
             return render(request, "add_elements_surfey.html", {"form": form, 'h2_ctx': h2_ctx})
 
 
-
-
 class ShowSurveysView(LoginRequiredMixin, View):
     login_url = '/'
+
     def get(self, request):
         survey_filter = SurveyFilter(request.GET, queryset=Survey.objects.all().order_by('-survey_date'))
         page = request.GET.get('page', 1)
@@ -133,37 +134,71 @@ class ShowContractorsView(View):
         return render(request, 'contractors.html', {"contractors": contractors})
 
 
-
 class ScheduleView(View):
     def get(self, request):
-        form = ScheduleForm()
+
         building = request.GET.get('building')
         scope = request.GET.get('scope')
-        schedule_date=""
+        schedule_date = ""
+        form = ScheduleForm(initial={"building": building, "scope": scope})
+
+
 
         if building or scope:
-            today=datetime.date.today()
-            month=today.month
-            year=today.year
-            if int(scope)==1:
-                month+=3
-                if month>12:
-                    month-=12
-                    year+=1
-                max_day=monthrange(year, month)[1]
+            if not building:
+                building = [b.id for b in (Buildings.objects.all())]
+
+            today = datetime.date.today()
+            month = today.month
+            year = today.year
+            if int(scope) == 1:
+                month += 3
+                if month > 12:
+                    month -= 12
+                    year += 1
+                max_day = monthrange(year, month)[1]
                 schedule_date = datetime.date(year, month, max_day)
 
-            if int(scope)==2: schedule_date=datetime.date(year, 12, 31)
-            if int(scope)==3: schedule_date=datetime.date((year+1), 12, 31)
+                surveys = Survey.objects.filter(is_open="True", building__in=building,
+                                                valid_date__lte=schedule_date).order_by("valid_date")
+
+            if int(scope) == 2:
+                schedule_date = datetime.date(year, 12, 31)
+                surveys = Survey.objects.filter(is_open="True", building__in=building,
+                                                valid_date__lte=schedule_date).order_by("valid_date")
+            if int(scope) == 3:
+                start_schedule_date = datetime.date((year + 1), 1, 1)
+                schedule_date = datetime.date((year + 1), 12, 31)
+                surveys = Survey.objects.filter(is_open="True", building__in=building,
+                                                valid_date__lte=schedule_date,
+                                                valid_date__gte=start_schedule_date).order_by("valid_date")
 
 
-            surveys = Survey.objects.filter(is_open="True").filter(building=building).filter(valid_date__lte=schedule_date).order_by("valid_date")
+
         else:
             surveys = Survey.objects.filter(is_open="True").order_by("valid_date")
 
+        surveys_message=[(survey.name, survey.get_kind_display()) for survey in surveys]
+        form_mail = SendMailForm(initial={'message': surveys_message, "subject":"zlecenie przeglądu"})
 
+        return render(request, "schedule.html", {"form": form, "surveys": surveys, "schedule_date": schedule_date, "form_mail":form_mail})
 
-        return render(request, "schedule.html", {"form": form, "surveys":surveys, "schedule_date":schedule_date})
+    # ===============email
+    def post(self, request):
+        form_mail = SendMailForm(request.POST)
+        if form_mail.is_valid():
+            subject = form_mail.cleaned_data['subject']
+            message = form_mail.cleaned_data['message']
+            address = form_mail.cleaned_data['address']
+            send_mail(
+                subject,
+                message,
+                'ekob_info@wp.pl',
+                [address.mail],
+
+            )
+            return HttpResponse('poszło ok')
+
 
 
 
@@ -186,6 +221,7 @@ class SurveyDelete(DeleteView):
     def get_success_url(self):
         return "/surveys/"
 
+
 # =========================== FILES SECTION =====================
 
 class ReadPdf(View):
@@ -195,6 +231,7 @@ class ReadPdf(View):
             response = HttpResponse(pdf_file.read(), content_type='application/pdf')
             response['Content-Disposition'] = 'inline;filename=' + file_path
         return response
+
 
 # ==================LOGIN SECTION=======================
 
@@ -225,17 +262,14 @@ def logout_view(request):
 class RegistrationView(View):
 
     def get(self, request):
-        form=RegistrationForm()
-        return render(request, "add_elements_surfey.html", {"form":form}) #todo zmienić template
+        form = RegistrationForm()
+        return render(request, "add_elements_surfey.html", {"form": form})  # todo zmienić template
 
     def post(self, request):
-        form=RegistrationForm(request.POST)
+        form = RegistrationForm(request.POST)
         if form.is_valid():
             username = form.cleaned_data['username']
             password = form.cleaned_data['password']
-            email=form.cleaned_data['email']
+            email = form.cleaned_data['email']
             User.objects.create_user(username=username, password=password, email=email)
             return HttpResponseRedirect('/')
-
-
-

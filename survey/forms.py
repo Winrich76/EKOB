@@ -33,7 +33,7 @@ class AddContractorsForm(forms.Form):
                            label="nazwa wykonawcy")
     phone = forms.CharField(max_length=11, widget=forms.TextInput(attrs={'class': 'formIn', 'size': '12'}),
                             label="numer telefonu", required=False)
-    mail = forms.CharField(max_length=24, widget=forms.EmailInput(attrs={'class': 'formIn', 'size': '24'}),
+    mail = forms.CharField(max_length=48, widget=forms.EmailInput(attrs={'class': 'formIn', 'size': '48'}),
                            label='e-mail', required=False)
     industry = forms.ChoiceField(choices=INDUSTRY_CONTR, label='branża', widget=forms.Select(attrs={'class': 'formIn'}))
 
@@ -77,16 +77,25 @@ class RegistrationForm(forms.Form):
     password = forms.CharField(label="Password", widget=forms.PasswordInput)
     email=forms.CharField(label="adres e-mail", widget=forms.EmailInput)
 
-
-
 SCOPE_SCHEDULE=(
 
     (1, "kwartał"),
     (2, "koniec roku"),
-    (3, "przyszły rok")
+    (3, "tylko przyszły rok")
 )
 
-
 class ScheduleForm(forms.Form):
-    scope=forms.ChoiceField(choices=SCOPE_SCHEDULE)
-    building=BuildingChoiceField(queryset=Buildings.objects.all())
+    scope=forms.ChoiceField(choices=SCOPE_SCHEDULE, label="Przeglądy ważne do:")
+    building=BuildingChoiceField(queryset=Buildings.objects.all(), required=False, empty_label='wszystkie', label="Budynek")
+
+
+
+class ContractorsChoiceMailField(forms.ModelChoiceField):
+    def label_from_instance(self, obj):
+        return obj.mail
+
+class SendMailForm(forms.Form):
+    address = ContractorsChoiceField(queryset=Contractors.objects.all())
+    subject=forms.CharField()
+    message=forms.CharField(widget=forms.Textarea)
+

@@ -20,7 +20,7 @@ INDUSTRY_CONTR = (
 class Contractors(models.Model):
     name = models.CharField(max_length=48)
     phone = models.CharField(max_length=12)
-    mail = models.CharField(max_length=24)
+    mail = models.CharField(max_length=48)
     industry = models.IntegerField(choices=INDUSTRY_CONTR)
 
     def __str__(self):

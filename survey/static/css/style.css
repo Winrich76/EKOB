@@ -177,14 +177,11 @@ img {
 }
 
 .centerButton{
-    /*margin-left: 45%;*/
-    /*margin-right: auto;*/
-    /*border-width: 1px;*/
-    /*border-style: dashed;*/
+
     margin: auto;
     text-align: center;
     padding-top: 10px;
-    width: 10%;
+    width: 30%;
     display: flex;
 }
 
@@ -246,6 +243,12 @@ color:red;
 
 td.is_ok {
     color: green;
+}
+
+td.passw {
+    font-size: 18px;
+    border: 0;
+    font-family: 'Lato', sans-serif;
 }
 
 .invisible {

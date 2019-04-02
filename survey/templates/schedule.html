@@ -1,8 +1,8 @@
-{% extends 'base-one_column.html' %}
+{% extends 'base-main.html' %}
 {% load static %}
 {% load widget_tweaks %}
 
-{% block content %}
+{% block content_left %}
 
     <form method="get">
     <table>
@@ -10,6 +10,7 @@
     </table>
     <button>Filtruj</button>
     </form>
+    <div style="clear:both"></div>
     <div style="margin: 10px"></div>
     <p>data zakresu {{ schedule_date }}</p>
     <table>
@@ -18,7 +19,7 @@
             <th>Budynek</th>
             <th>Przegląd</th>
             <th>Data Przeglądu</th>
-            <th>Status</th>
+            <th>Wykonawca</th>
         </tr>
 
         {% for survey in surveys %}
@@ -27,11 +28,21 @@
                 <td>{{ survey.building }}</td>
                 <td>{{ survey.get_kind_display }}</td>
                 <td>{{ survey.survey_date }}</td>
-                <td>{{ survey.is_open }}</td>
+                <td>{{ survey.contractor }}</td>
 
             </tr>
         {% endfor %}
 
     </table>
+{% endblock %}
+
+{% block content_right %}
+    <form action="" method="post">
+        {% csrf_token %}
+        <table>
+            {{ form_mail }}
+        </table>
+        <button type="submit" >wyślij</button>
+    </form>
 
 {% endblock %}
