@@ -3,8 +3,10 @@ from calendar import monthrange
 from django.contrib.auth import authenticate, login, logout
 from django.contrib.auth.mixins import  LoginRequiredMixin
 from django.contrib.auth.models import User
+from django.core.files.storage import FileSystemStorage
 from django.core.mail import send_mail
 from django.core.paginator import Paginator, PageNotAnInteger, EmptyPage
+from django.template.loader import render_to_string
 from django.http import HttpResponse, HttpResponseRedirect
 from django.shortcuts import render
 from django.views import View
@@ -18,6 +20,8 @@ from survey.forms import AddSurveyForm, AddContractorsForm, AddExecutionForm, Lo
 from survey.functions import validity_date, length_valid, check_open_survey
 from survey.messages import text_message
 from survey.models import Buildings, Survey, Contractors, Execution
+
+from weasyprint import HTML
 
 TO_CONTRACTOR = "to_contractor"
 
@@ -112,6 +116,7 @@ class ShowSurveysView(LoginRequiredMixin, View):
         survey_filter = SurveyFilter(request.GET, queryset=Survey.objects.all().order_by('-survey_date'))
         page = request.GET.get('page', 1)
         paginator = Paginator(survey_filter.qs, 10)
+        raport_pdf = request.GET.get('raport_PDF')
 
         try:
             survey_f = paginator.page(page)
@@ -123,8 +128,24 @@ class ShowSurveysView(LoginRequiredMixin, View):
         today = datetime.datetime.today()
         executions = Execution.objects.all()
 
+        if raport_pdf:
+            self.raport_to_pdf_view(request)
+
         return render(request, "surveys.html",
                       {'filter': survey_filter, "paginator": survey_f, "today": today, 'execution': executions})
+
+    def raport_to_pdf_view(self, request):
+        paragraphs = ['first paragraph', 'trzeci i drugi', 'third paragraph']
+        html_string = render_to_string('pdf_template.html', {'paragraphs': paragraphs})
+
+        html = HTML(string=html_string)
+        html.write_pdf(target='media/pdf/mypdf.pdf')
+
+        fs = FileSystemStorage('media/pdf/')
+        with fs.open('mypdf.pdf') as pdf:
+            response = HttpResponse(pdf, content_type='application/pdf')
+            response['Content-Disposition'] = 'attachment; filename="mypdf.pdf"'
+        return response
 
 
 class ShowContractorsView(View):
@@ -140,8 +161,6 @@ class ScheduleView(View):
         scope = request.GET.get('scope')
         form = ScheduleForm(initial={"building": building, "scope": scope})
         today = datetime.date.today()
-
-
 
         if building or scope:
             if not building:
@@ -228,6 +247,21 @@ class ReadPdf(View):
             response = HttpResponse(pdf_file.read(), content_type='application/pdf')
             response['Content-Disposition'] = 'inline;filename=' + file_path
         return response
+
+# class CreatePdfView(View):
+
+def html_to_pdf_view(request):
+    paragraphs = ['first paragraph', 'trzeci', 'third paragraph']
+    html_string = render_to_string('pdf_template.html', {'paragraphs': paragraphs})
+
+    html = HTML(string=html_string)
+    html.write_pdf(target='media/pdf/mypdf.pdf')
+
+    fs = FileSystemStorage('media/pdf/')
+    with fs.open('mypdf.pdf') as pdf:
+        response = HttpResponse(pdf, content_type='application/pdf')
+        response['Content-Disposition'] = 'attachment; filename="mypdf.pdf"'
+    return response
 
 
 # ==================LOGIN SECTION=======================

@@ -26,6 +26,13 @@
                             <td class="filter"><label class="container"><input type="checkbox" id="check_valid" >  <span class="checkmark"></span></label></td>
 
                         </tr>
+                         <tr>
+                            <td class="filter">raport PDF</td>
+                            <td class="filter"><label class="container"><input type="checkbox" name="raport_PDF" >  <span class="checkmark"></span></label></td>
+                             <td class="filter"></td>
+                             <td class="filter"></td>
+
+                        </tr>
                     </table>
 
                     <div class="invisible">
@@ -131,6 +138,18 @@
 
             </tbody>
         </table>
+        <div>
+            <form method="get" action="">
+                <button type="submit" id="update" >edytuj</button>
+            </form>
+             <form method="get" action="">
+                <button type="submit" id="execution" >dodaj wykonanie</button>
+            </form>
+             <form method="get" action="">
+                <button class="red" type="submit" id="delete" >kasuj</button>
+            </form>
+        </div>
+        <p style="clear:both"><br></p>
         <div class="boxH"><h3>Zestawienie wykonania zaleceń z przegladu</h3></div>
         <div>
             <table>
@@ -152,18 +171,7 @@
                 </tbody>
             </table>
         </div>
-        <div>
-            <form method="get" action="">
-                <button type="submit" id="update" >edytuj</button>
-            </form>
-             <form method="get" action="">
-                <button type="submit" id="execution" >dodaj wykonanie</button>
-            </form>
-             <form method="get" action="">
-                <button class="red" type="submit" id="delete" >kasuj</button>
-            </form>
-        </div>
-        <p style="clear:both"><br></p>
+
     </div>
 {% endblock %}
 {% block content_js_script %}
