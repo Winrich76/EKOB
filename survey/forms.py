@@ -1,6 +1,5 @@
 from django import forms
 import datetime
-from django.core.validators import EmailValidator
 from django.core.exceptions import ValidationError
 
 from survey.models import Buildings, Contractors, KIND_SURVEY, INDUSTRY_CONTR, Survey, PdfFile
@@ -79,9 +78,9 @@ class RegistrationForm(forms.Form):
 
 SCOPE_SCHEDULE=(
 
-    (1, "kwartał"),
-    (2, "koniec roku"),
-    (3, "tylko przyszły rok")
+    ("quarter", "kwartał"),
+    ("end_of_year", "koniec roku"),
+    ("only_next_year", "tylko przyszły rok")
 )
 
 class ScheduleForm(forms.Form):

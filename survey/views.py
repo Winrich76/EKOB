@@ -1,38 +1,37 @@
-import os
 from calendar import monthrange
 
 from django.contrib.auth import authenticate, login, logout
-from django.contrib.auth.mixins import PermissionRequiredMixin, LoginRequiredMixin
+from django.contrib.auth.mixins import  LoginRequiredMixin
 from django.contrib.auth.models import User
-from django.core.mail import send_mail, BadHeaderError
+from django.core.mail import send_mail
 from django.core.paginator import Paginator, PageNotAnInteger, EmptyPage
-from django.db.models import Q
 from django.http import HttpResponse, HttpResponseRedirect
 from django.shortcuts import render
-from django.core.exceptions import ValidationError
-from django.urls import reverse_lazy
 from django.views import View
-from django.views.generic import CreateView, UpdateView, DeleteView, FormView
+from django.views.generic import UpdateView, DeleteView
 import datetime
-from django.http import FileResponse
+
 
 from survey.filters import SurveyFilter
-from survey.forms import AddSurveyForm, AddContractorsForm, AddExecutionForm, PdfModelForm, LoginForm, RegistrationForm, \
+from survey.forms import AddSurveyForm, AddContractorsForm, AddExecutionForm, LoginForm, RegistrationForm, \
     ScheduleForm, SendMailForm
 from survey.functions import validity_date, length_valid, check_open_survey
-from survey.models import Buildings, Survey, Contractors, Execution, PdfFile
+from survey.messages import text_message
+from survey.models import Buildings, Survey, Contractors, Execution
+
+TO_CONTRACTOR = "to_contractor"
 
 
 class AddSurveyView(View):
     def get(self, request):
         form = AddSurveyForm()
-        request.session["contr"] = True
+        request.session[TO_CONTRACTOR] = True
         return render(request, "add_survey.html", {"form": form})
 
     def post(self, request):
         form = AddSurveyForm(request.POST, request.FILES)
         if form.is_valid():
-            del (request.session["contr"])
+            del (request.session[TO_CONTRACTOR])
             building = form.cleaned_data['building']
             kind = form.cleaned_data['kind']
             description = form.cleaned_data['description']
@@ -75,7 +74,7 @@ class AddContractorView(View):
             mail = form.cleaned_data['mail']
             industry = form.cleaned_data['industry']
             Contractors.objects.create(name=name, phone=phone, mail=mail, industry=industry)
-            if request.session.get("contr"):
+            if request.session.get(TO_CONTRACTOR):
                 return HttpResponseRedirect('/addsurvey')
             else:
                 return HttpResponseRedirect('/contractors')
@@ -139,7 +138,6 @@ class ScheduleView(View):
 
         building = request.GET.get('building')
         scope = request.GET.get('scope')
-        schedule_date = ""
         form = ScheduleForm(initial={"building": building, "scope": scope})
         today = datetime.date.today()
 
@@ -147,50 +145,39 @@ class ScheduleView(View):
 
         if building or scope:
             if not building:
-                building = [b.id for b in (Buildings.objects.all())]
+                building = [building.id for building in (Buildings.objects.all())]
 
             month = today.month
             year = today.year
-            if int(scope) == 1:
+            if scope == "quarter":
                 month += 3
                 if month > 12:
                     month -= 12
                     year += 1
                 max_day = monthrange(year, month)[1]
-                schedule_date = datetime.date(year, month, max_day)
+                end_of_scope = datetime.date(year, month, max_day)
 
                 surveys = Survey.objects.filter(is_open="True", building__in=building,
-                                                valid_date__lte=schedule_date).order_by("valid_date")
+                                                valid_date__lte=end_of_scope).order_by("valid_date")
 
-            if int(scope) == 2:
-                schedule_date = datetime.date(year, 12, 31)
+            if scope == "end_of_year":
+                end_of_scope = datetime.date(year, 12, 31)
                 surveys = Survey.objects.filter(is_open="True", building__in=building,
-                                                valid_date__lte=schedule_date).order_by("valid_date")
-            if int(scope) == 3:
-                start_schedule_date = datetime.date((year + 1), 1, 1)
-                schedule_date = datetime.date((year + 1), 12, 31)
+                                                valid_date__lte=end_of_scope).order_by("valid_date")
+            if scope == "only_next_year":
+                start_new_year = datetime.date((year + 1), 1, 1)
+                end_of_scope = datetime.date((year + 1), 12, 31)
                 surveys = Survey.objects.filter(is_open="True", building__in=building,
-                                                valid_date__lte=schedule_date,
-                                                valid_date__gte=start_schedule_date).order_by("valid_date")
-
-
-
+                                                valid_date__lte=end_of_scope,
+                                                valid_date__gte=start_new_year).order_by("valid_date")
         else:
             surveys = Survey.objects.filter(is_open="True").order_by("valid_date")
-
-        surveys_message=[[survey.building, survey.get_kind_display(), survey.valid_date] for survey in surveys]
-        text="Zlecam następujące przeglądy:\n"
-        for i in surveys_message:
-            if i[2]<today:
-                i[2]="pilne !!!"
-            text+=("przegląd: {}, dla budynku: {}, w terminie do: {} \n".format(i[1], i[0], i[2]))
-
-
+        text=text_message(surveys, today)
         form_mail = SendMailForm(initial={'message': text, "subject":"zlecenie przeglądu"})
 
-        return render(request, "schedule.html", {"form": form, "surveys": surveys, "schedule_date": schedule_date, "form_mail":form_mail})
+        return render(request, "schedule.html", {"form": form, "surveys": surveys,  "form_mail":form_mail})
 
-    # ===============email
+
     def post(self, request):
 
         form_mail = SendMailForm(request.POST)

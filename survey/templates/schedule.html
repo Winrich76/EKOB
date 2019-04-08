@@ -6,13 +6,21 @@
     <div class="boxH"><h3>Planowanie przegladów</h3></div>
     <form method="get">
     <table>
-        {{ form}}
+        <tr>
+                <th class="form_up">{{ form.scope.label_tag }}</th>
+                <td>{{ form.scope.errors }}{{ form.scope }}</td>
+            </tr>
+            <tr>
+                <th class="form_up">{{ form.building.label_tag }}</th>
+                <td>{{ form.building.errors }}{{ form.building }}</td>
+            </tr>
+
+
     </table>
     <button>Filtruj</button>
     </form>
     <div style="clear:both"></div>
     <div style="margin: 10px"></div>
-    <p>data zakresu {{ schedule_date }}</p>
     <table>
         <tr>
             <th>Ważny do</th>
@@ -41,12 +49,12 @@
     <form action="" method="post">
 
         {% csrf_token %}
-         {{ form.non_field_errors }}
-        {% for hidden_field in form.hidden_fields %}
+         {{ form_mail.non_field_errors }}
+        {% for hidden_field in form_mail.hidden_fields %}
             {{ hidden_field.errors }}
             {{ hidden_field }}
         {% endfor %}
-        <table>{{ form.field_name.errors }}
+        <table>{{ form_mail.field_name.errors }}
             <tr>
                 <th class="form_up">{{ form_mail.address.label_tag }}</th>
                 <td class="maxWidth">{{ form_mail.address.errors }}{{ form_mail.address }}</td>
