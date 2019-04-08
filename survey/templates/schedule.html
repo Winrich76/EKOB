@@ -1,0 +1,75 @@
+{% extends 'base-main.html' %}
+{% load static %}
+{% load widget_tweaks %}
+
+{% block content_left %}
+    <div class="boxH"><h3>Planowanie przegladów</h3></div>
+    <form method="get">
+    <table>
+        <tr>
+                <th class="form_up">{{ form.scope.label_tag }}</th>
+                <td>{{ form.scope.errors }}{{ form.scope }}</td>
+            </tr>
+            <tr>
+                <th class="form_up">{{ form.building.label_tag }}</th>
+                <td>{{ form.building.errors }}{{ form.building }}</td>
+            </tr>
+
+
+    </table>
+    <button>Filtruj</button>
+    </form>
+    <div style="clear:both"></div>
+    <div style="margin: 10px"></div>
+    <table>
+        <tr>
+            <th>Ważny do</th>
+            <th>Budynek</th>
+            <th>Przegląd</th>
+            <th>Wykonawca</th>
+
+        </tr>
+
+        {% for survey in surveys %}
+            <tr>
+                <td>{{ survey.valid_date }}</td>
+                <td>{{ survey.building }}</td>
+                <td>{{ survey.get_kind_display }}</td>
+                <td>{{ survey.contractor }}</td>
+
+
+            </tr>
+        {% endfor %}
+
+    </table>
+{% endblock %}
+
+{% block content_right %}
+    <div class="boxH"><h3>Zlecanie przegladów</h3></div>
+    <form action="" method="post">
+
+        {% csrf_token %}
+         {{ form_mail.non_field_errors }}
+        {% for hidden_field in form_mail.hidden_fields %}
+            {{ hidden_field.errors }}
+            {{ hidden_field }}
+        {% endfor %}
+        <table>{{ form_mail.field_name.errors }}
+            <tr>
+                <th class="form_up">{{ form_mail.address.label_tag }}</th>
+                <td class="maxWidth">{{ form_mail.address.errors }}{{ form_mail.address }}</td>
+            </tr>
+            <tr>
+                <th class="form_up">{{ form_mail.subject.label_tag }}</th>
+                <td>{{ form_mail.subject.errors }}{{ form_mail.subject }}</td>
+            </tr>
+            <tr>
+                <th class="form_up">{{ form_mail.message.label_tag }}</th>
+                <td>{{ form_mail.message.errors }}{{ form_mail.message }}</td>
+            </tr>
+
+        </table>
+        <button type="submit" >wyślij</button>
+    </form>
+
+{% endblock %}

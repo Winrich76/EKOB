@@ -13,7 +13,8 @@
     </div>
 
     <div class="topnav">
-          <ul>
+        <div>
+            <ul>
               <li><a href="#">Budynki</a></li>
 
               <li class="dropdown">
@@ -22,13 +23,18 @@
                             <a href="/surveys/">Pokaż wszystkie</a>
                             <a href="/addsurvey/">Dodaj przegląd</a>
                             <a href="/addcontractor/">Dodaj wykonawcę</a>
-                            <a href="#">Zaplanuj</a>
+                            <a href="/schedule/">Zaplanuj</a>
                         </div>
               </li>
               <li><a href="#">Remonty</a></li>
               <li><a href="#">Dokumentacja</a></li>
               <li><a href="#">Home</a></li>
-          </ul>
+            </ul>
+        </div>
+        <div>
+            <p>zalogowany jako {{ user.username }} <a href="/logout"> wyloguj</a></p>
+        </div>
+
     </div>
 
 

@@ -17,8 +17,7 @@ def validity_date(date_s, valid):
     year += year_delta
     max_day = monthrange(year, month)[1]
 
-    if day > max_day:
-        day = max_day
+    if day > max_day: day = max_day
 
     new_date_survey = datetime.datetime(year, month, day)
 

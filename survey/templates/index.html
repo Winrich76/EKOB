@@ -6,6 +6,7 @@
     <title>Elektroniczna Książka Obiektu</title>
     <link rel="stylesheet" href="{% static "css/style.css" %}">
     <link href='http://fonts.googleapis.com/css?family=Headland+One&subset=latin,latin-ext' rel='stylesheet' type='text/css'>
+    <link href='http://fonts.googleapis.com/css?family=Lato&subset=latin,latin-ext' rel='stylesheet' type='text/css'>
 </head>
 <body>
 
@@ -14,12 +15,31 @@
     <div>
         <img class="" src="{% static "img/index.jpg" %}">
     </div>
+
+
+
     <div class="centerButton">
-        <a href="{% url 'list_surveys' %}"><button class="blue">wejdź</button></a>
-        <div style="clear:both"></div>
+         <form  method="post">
+
+             <table border="1" style="border-color: #005b96">
+                 <tr >
+                     <td class="passw">{{ form.username.label_tag }}</td>
+                     <td class="passw">{{ form.username }}</td>
+                 </tr>
+                 <tr >
+                     <td class="passw">{{ form.password.label_tag }}</td>
+                     <td class="passw">{{ form.password }}</td>
+                 </tr>
+                 {% csrf_token %}
+
+             </table>
+                <button class="blue">zaloguj</button>
+                <a href="{% url 'registration' %}"><button style="margin: 0px">zarejestruj</button></a>
+                <div style="clear:both"></div>
+
+        </form>
+        {{ msg }}
     </div>
-
-
 </div>
 
 </body>
