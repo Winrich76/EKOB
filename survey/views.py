@@ -1,18 +1,18 @@
 from calendar import monthrange
 
 from django.contrib.auth import authenticate, login, logout
-from django.contrib.auth.mixins import  LoginRequiredMixin
+from django.contrib.auth.mixins import LoginRequiredMixin
 from django.contrib.auth.models import User
 from django.core.files.storage import FileSystemStorage
 from django.core.mail import send_mail
 from django.core.paginator import Paginator, PageNotAnInteger, EmptyPage
+
 from django.template.loader import render_to_string
 from django.http import HttpResponse, HttpResponseRedirect
 from django.shortcuts import render
 from django.views import View
 from django.views.generic import UpdateView, DeleteView
 import datetime
-
 
 from survey.filters import SurveyFilter
 from survey.forms import AddSurveyForm, AddContractorsForm, AddExecutionForm, LoginForm, RegistrationForm, \
@@ -21,7 +21,7 @@ from survey.functions import validity_date, length_valid, check_open_survey
 from survey.messages import text_message
 from survey.models import Buildings, Survey, Contractors, Execution
 
-from weasyprint import HTML
+from weasyprint import HTML, CSS
 
 TO_CONTRACTOR = "to_contractor"
 
@@ -116,8 +116,6 @@ class ShowSurveysView(LoginRequiredMixin, View):
         survey_filter = SurveyFilter(request.GET, queryset=Survey.objects.all().order_by('-survey_date'))
         page = request.GET.get('page', 1)
         paginator = Paginator(survey_filter.qs, 10)
-        raport_pdf = request.GET.get('raport_PDF')
-
         try:
             survey_f = paginator.page(page)
         except PageNotAnInteger:
@@ -127,32 +125,21 @@ class ShowSurveysView(LoginRequiredMixin, View):
 
         today = datetime.datetime.today()
         executions = Execution.objects.all()
-
-        if raport_pdf:
-            self.raport_to_pdf_view(request)
-
+        self.raport_to_pdf_view(request, survey_filter, today)
         return render(request, "surveys.html",
                       {'filter': survey_filter, "paginator": survey_f, "today": today, 'execution': executions})
 
-    def raport_to_pdf_view(self, request):
-        paragraphs = ['first paragraph', 'trzeci i drugi', 'third paragraph']
-        html_string = render_to_string('pdf_template.html', {'paragraphs': paragraphs})
+    def raport_to_pdf_view(self, request, surveys, today):
 
+        html_string = render_to_string('pdf_template.html', {'surveys': surveys, 'today': today})
         html = HTML(string=html_string)
-        html.write_pdf(target='media/pdf/mypdf.pdf')
-
-        fs = FileSystemStorage('media/pdf/')
-        with fs.open('mypdf.pdf') as pdf:
-            response = HttpResponse(pdf, content_type='application/pdf')
-            response['Content-Disposition'] = 'attachment; filename="mypdf.pdf"'
-        return response
+        html.write_pdf(target='media/pdf_report/survey_report.pdf', stylesheets=[CSS('survey/static/css/PDFstyle.css')])
 
 
 class ShowContractorsView(View):
     def get(self, request):
         contractors = Contractors.objects.all()
         return render(request, 'contractors.html', {"contractors": contractors})
-
 
 class ScheduleView(View):
     def get(self, request):
@@ -161,6 +148,7 @@ class ScheduleView(View):
         scope = request.GET.get('scope')
         form = ScheduleForm(initial={"building": building, "scope": scope})
         today = datetime.date.today()
+        surveys = Survey.objects.filter(is_open="True").order_by("valid_date")
 
         if building or scope:
             if not building:
@@ -176,26 +164,24 @@ class ScheduleView(View):
                 max_day = monthrange(year, month)[1]
                 end_of_scope = datetime.date(year, month, max_day)
 
-                surveys = Survey.objects.filter(is_open="True", building__in=building,
-                                                valid_date__lte=end_of_scope).order_by("valid_date")
+                surveys = surveys.filter(is_open="True", building__in=building,
+                                         valid_date__lte=end_of_scope).order_by("valid_date")
 
             if scope == "end_of_year":
                 end_of_scope = datetime.date(year, 12, 31)
-                surveys = Survey.objects.filter(is_open="True", building__in=building,
-                                                valid_date__lte=end_of_scope).order_by("valid_date")
+                surveys = surveys.filter(is_open="True", building__in=building,
+                                         valid_date__lte=end_of_scope).order_by("valid_date")
             if scope == "only_next_year":
                 start_new_year = datetime.date((year + 1), 1, 1)
                 end_of_scope = datetime.date((year + 1), 12, 31)
-                surveys = Survey.objects.filter(is_open="True", building__in=building,
-                                                valid_date__lte=end_of_scope,
-                                                valid_date__gte=start_new_year).order_by("valid_date")
-        else:
-            surveys = Survey.objects.filter(is_open="True").order_by("valid_date")
-        text=text_message(surveys, today)
-        form_mail = SendMailForm(initial={'message': text, "subject":"zlecenie przeglądu"})
+                surveys = surveys.filter(is_open="True", building__in=building,
+                                         valid_date__lte=end_of_scope,
+                                         valid_date__gte=start_new_year).order_by("valid_date")
 
-        return render(request, "schedule.html", {"form": form, "surveys": surveys,  "form_mail":form_mail})
+        text = text_message(surveys, today)
+        form_mail = SendMailForm(initial={'message': text, "subject": "zlecenie przeglądu"})
 
+        return render(request, "schedule.html", {"form": form, "surveys": surveys, "form_mail": form_mail})
 
     def post(self, request):
 
@@ -240,7 +226,7 @@ class SurveyDelete(DeleteView):
 
 # =========================== FILES SECTION =====================
 
-class ReadPdf(View):
+class ReadPdfView(View):
     def get(self, request, pdf):
         file_path = "media/pdf/" + pdf
         with open(file_path, 'rb') as pdf_file:
@@ -248,19 +234,12 @@ class ReadPdf(View):
             response['Content-Disposition'] = 'inline;filename=' + file_path
         return response
 
-# class CreatePdfView(View):
 
-def html_to_pdf_view(request):
-    paragraphs = ['first paragraph', 'trzeci', 'third paragraph']
-    html_string = render_to_string('pdf_template.html', {'paragraphs': paragraphs})
-
-    html = HTML(string=html_string)
-    html.write_pdf(target='media/pdf/mypdf.pdf')
-
-    fs = FileSystemStorage('media/pdf/')
-    with fs.open('mypdf.pdf') as pdf:
+def display_survey_pdf_raport(request):
+    fs = FileSystemStorage('media/pdf_report/')
+    with fs.open('survey_report.pdf') as pdf:
         response = HttpResponse(pdf, content_type='application/pdf')
-        response['Content-Disposition'] = 'attachment; filename="mypdf.pdf"'
+        response['Content-Disposition'] = 'attachment; filename="survey_report.pdf"'
     return response
 
 

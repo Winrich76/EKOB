@@ -19,8 +19,8 @@ from django.conf import settings
 from django.conf.urls.static import static
 
 from survey.views import AddSurveyView, AddContractorView, ShowSurveysView, UpdateSurvey, SurveyDelete, \
-    ShowContractorsView, AddExecutionView, ReadPdf, LoginView, logout_view, RegistrationView, ScheduleView, \
-    html_to_pdf_view
+    ShowContractorsView, AddExecutionView, ReadPdfView, LoginView, logout_view, RegistrationView, ScheduleView, \
+    display_survey_pdf_raport
 
 urlpatterns = [
                   path('admin/', admin.site.urls),
@@ -34,9 +34,13 @@ urlpatterns = [
                   path('surveys/<int:survey_id>/', UpdateSurvey.as_view()),
                   path('surveys/delete/<int:survey_id>/', SurveyDelete.as_view()),
                   path('surveys/execution/<int:survey_id>/', AddExecutionView.as_view()),
-                  path('surveys/pdf/<str:pdf>/', ReadPdf.as_view(), name='show_pdf'),
+                  path('surveys/pdf/<str:pdf>/', ReadPdfView.as_view(), name='show_pdf'),
+                  path('surveys/report/', display_survey_pdf_raport, name='survey_report_pdf'),
                   path('contractors/', ShowContractorsView.as_view(), name='list_contractors'),
                   path('schedule/', ScheduleView.as_view()),
-                  path('create/', html_to_pdf_view),
+
+
+
+
 
               ] + static(settings.MEDIA_URL, document_root=settings.MEDIA_ROOT)

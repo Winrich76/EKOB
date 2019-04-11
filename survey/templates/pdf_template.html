@@ -1,16 +1,42 @@
-<html>
+
+<!DOCTYPE html>
+<html lang="en">
 <head>
-  <title>Test</title>
-  <style>
-    body {
-      background-color: #f7f7f7;
-    }
-  </style>
+    <meta charset="UTF-8">
+    <title>Elektroniczna Książka Obiektu-raport pdf</title>
+    <link href='http://fonts.googleapis.com/css?family=Lato&subset=latin,latin-ext' rel='stylesheet' type='text/css'>
+
+
 </head>
 <body>
-  <h1>Test Template</h1>
-  {% for paragraph in paragraphs %}
-    <p>{{ paragraph }}</p>
-  {% endfor %}
+  <h2>Zestawienie przeglądów</h2>
+  <table>
+      <tr>
+          <th > Budynek</th>
+          <th> Typ przeglądu</th>
+          <th> Data wykonania</th>
+          <th> Ważny do</th>
+          <th> Status</th>
+      </tr>
+        {% for survey in surveys.qs %}
+            <tr style="border-bottom-width: thick">
+                <td>{{ survey.building.name }}</td>
+                <td>{{ survey.get_kind_display}}</td>
+                <td>{{ survey.survey_date}}</td>
+                <td>{{ survey.valid_date }}</td>
+                {% if survey.is_open and survey.valid_date < today.date %}
+                    <td class="outdate"> bieżący NIEAKTUALNY </td>
+                {% elif survey.is_open and survey.valid_date >= today.date %}
+                    <td class="is_ok"> bieżący </td>
+                {% else  %}
+                    <td>archiwalny</td>
+                {% endif %}
+
+            </tr>
+
+        {% endfor %}
+
+  </table>
+<p>Dokument wygenerowany automatycznie z programu EKOB w dniu {{ today }}</p>
 </body>
 </html>

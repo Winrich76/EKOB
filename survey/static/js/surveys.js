@@ -34,7 +34,7 @@ document.addEventListener("DOMContentLoaded", function() {
             btnDelete.parentElement.action='delete/'+row[0].id;
             btnExecution.parentElement.action='execution/'+row[0].id;
 
-                                                                // dodawanie elemnetów prawej górnej tabeli
+                                                                // Add elements into top right table
             infoTable.innerHTML="";
             let i=0;
             for (let item of row){
@@ -79,6 +79,9 @@ document.addEventListener("DOMContentLoaded", function() {
        }
 
     })
+
+
+
 
 });
 

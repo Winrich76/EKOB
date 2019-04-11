@@ -26,13 +26,6 @@
                             <td class="filter"><label class="container"><input type="checkbox" id="check_valid" >  <span class="checkmark"></span></label></td>
 
                         </tr>
-                         <tr>
-                            <td class="filter">raport PDF</td>
-                            <td class="filter"><label class="container"><input type="checkbox" name="raport_PDF" >  <span class="checkmark"></span></label></td>
-                             <td class="filter"></td>
-                             <td class="filter"></td>
-
-                        </tr>
                     </table>
 
                     <div class="invisible">
@@ -41,10 +34,14 @@
                     </div>
 
                     <div>
-                         <button type="submit">filtruj</button>
+                         <button type="submit" >filtruj</button>
+                    </div>
+                </form>
+                    <div>
+                         <a href="{% url 'survey_report_pdf' %}" ><button>Pobierz pdf</button></a>
                     </div>
                     <div style="clear:both"></div>
-                </form>
+
             </div>
         </div>
 
