@@ -5,3 +5,6 @@ Update:08-04-2019.
 
 Update:11-04-2019.
 	Add generating survey report to pdf file
+
+Update:15-04-2019.
+	improvement check_open_survey feature 
