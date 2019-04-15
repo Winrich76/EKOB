@@ -2,5 +2,6 @@ Application program EKOB supports managing technical documentation of buildings.
 
 Update:08-04-2019.
 	Add schedule and mailing ability
+
 Update:11-04-2019.
 	Add generating survey report to pdf file
