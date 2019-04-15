@@ -33,11 +33,14 @@ def length_valid(i_kind):
 
 
 
-def check_open_survey(Object, building, kind):
+def check_open_survey(Object, building, kind, date_new_survey):
     open_surveys = Object.objects.filter(building=building, kind=kind, is_open=True)
-    for survey in open_surveys:
+    for survey in open_surveys.filter(survey_date__lte=date_new_survey):
         survey.is_open = False
         survey.save()
-        #todo dopisać warunek na datę
+    if open_surveys.filter(survey_date__gte=date_new_survey):
+        return False
+    else:
+        return True
 
 

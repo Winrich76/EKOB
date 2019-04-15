@@ -34,6 +34,7 @@ class AddSurveyView(View):
 
     def post(self, request):
         form = AddSurveyForm(request.POST, request.FILES)
+
         if form.is_valid():
             del (request.session[TO_CONTRACTOR])
             building = form.cleaned_data['building']
@@ -43,11 +44,11 @@ class AddSurveyView(View):
             survey_date = form.cleaned_data['survey_date']
             pdf = form.cleaned_data['pdf']
 
-            check_open_survey(Survey, building, kind)
+            is_open_value=check_open_survey(Survey, building, kind, survey_date)
 
             valid_date = validity_date(survey_date, length_valid(int(kind)))
             Survey.objects.create(building=building, kind=kind, survey_date=survey_date, \
-                                  description=description, valid_date=valid_date, is_open=True, \
+                                  description=description, valid_date=valid_date, is_open=is_open_value, \
                                   contractor=contractor, pdf=pdf)
 
             return HttpResponseRedirect('/surveys')
