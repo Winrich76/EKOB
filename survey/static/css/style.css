@@ -310,7 +310,7 @@ select option {
 
 input.formIn {
   width: max-content;
-  padding: 12px 20px;
+  padding: 8px 16px;
   margin: 8px 0;
   border: 2px solid #ccc;
   border-radius: 4px;
@@ -318,7 +318,7 @@ input.formIn {
 }
 select.formIn {
   width: max-content;
-  padding: 12px 20px;
+  padding: 8px 16px;
   margin: 8px 0;
   border: 2px solid #ccc;
   border-radius: 4px;

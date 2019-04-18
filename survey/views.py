@@ -16,7 +16,7 @@ import datetime
 
 from survey.filters import SurveyFilter
 from survey.forms import AddSurveyForm, AddContractorsForm, AddExecutionForm, LoginForm, RegistrationForm, \
-    ScheduleForm, SendMailForm
+    ScheduleForm, SendMailForm, SurveyForm
 from survey.functions import validity_date, length_valid, check_open_survey
 from survey.messages import text_message
 from survey.models import Buildings, Survey, Contractors, Execution
@@ -44,7 +44,7 @@ class AddSurveyView(View):
             survey_date = form.cleaned_data['survey_date']
             pdf = form.cleaned_data['pdf']
 
-            is_open_value=check_open_survey(Survey, building, kind, survey_date)
+            is_open_value = check_open_survey(Survey, building, kind, survey_date)
 
             valid_date = validity_date(survey_date, length_valid(int(kind)))
             Survey.objects.create(building=building, kind=kind, survey_date=survey_date, \
@@ -142,6 +142,7 @@ class ShowContractorsView(View):
         contractors = Contractors.objects.all()
         return render(request, 'contractors.html', {"contractors": contractors})
 
+
 class ScheduleView(View):
     def get(self, request):
 
@@ -149,7 +150,7 @@ class ScheduleView(View):
         scope = request.GET.get('scope')
         form = ScheduleForm(initial={"building": building, "scope": scope})
         today = datetime.date.today()
-        surveys = Survey.objects.filter(is_open="True").order_by("valid_date")
+        surveys = Survey.objects.filter(is_open=True).order_by("valid_date")
 
         if building or scope:
             if not building:
@@ -215,6 +216,13 @@ class UpdateSurvey(UpdateView):
 
     def get_success_url(self):
         return "/surveys/"
+
+    def get_form(self, form_class=SurveyForm):
+        form = super(UpdateSurvey, self).get_form(form_class)
+        form.fields['description'].required = False
+        form.fields['pdf'].required = False
+
+        return form
 
 
 class SurveyDelete(DeleteView):

@@ -4,6 +4,8 @@ from django.core.exceptions import ValidationError
 
 from survey.models import Buildings, Contractors, KIND_SURVEY, INDUSTRY_CONTR, Survey, PdfFile
 
+year = datetime.date.today().year
+
 
 class BuildingChoiceField(forms.ModelChoiceField):
     def label_from_instance(self, obj):
@@ -19,8 +21,12 @@ class AddSurveyForm(forms.Form):
     building = BuildingChoiceField(label="budynek", queryset=Buildings.objects.all(),
                                    widget=forms.Select(attrs={'class': 'formIn'}))
     kind = forms.ChoiceField(label="typ przegladu", choices=KIND_SURVEY, widget=forms.Select(attrs={'class': 'formIn'}))
-    survey_date = forms.DateField(label="data przegladu", widget=forms.DateInput(attrs={'class': 'formIn'}))
-    description = forms.CharField(label="opis", widget=forms.Textarea, required=False)
+    survey_date = forms.DateField(label="data przegladu",
+                                  widget=forms.SelectDateWidget(years=range((year - 5), (year + 1)),
+                                                                attrs={'class': 'formIn'}))
+    description = forms.CharField(label="opis",
+                                  widget=forms.Textarea(attrs={'placeholder': 'Tu wpisz opis i zalecenia z przegladu'}),
+                                  required=False)
     contractor = ContractorsChoiceField(label="wykonawca", queryset=Contractors.objects.all(),
                                         widget=forms.Select(attrs={'class': 'formIn'}),
                                         help_text="  wybierz wykonawcę z listy lub utwórz nowego:")
@@ -44,8 +50,10 @@ class SurveyChoiceField(forms.ModelChoiceField):
 
 class AddExecutionForm(forms.Form):
     survey = SurveyChoiceField(label="Dla przeglądu:", queryset=Survey.objects.all(), widget=forms.HiddenInput)
-    date = forms.DateField(label="Data:", widget=forms.DateInput(attrs={'placeholder': 'YYYY-MM-DD', 'size': '10'}))
-    description = forms.CharField(label="Opis:", widget=forms.Textarea)
+    date = forms.DateField(label="Data:", widget=forms.SelectDateWidget(years=range((year - 5), (year + 1)),
+                                                                        attrs={'class': 'formIn'}))
+    description = forms.CharField(label="Opis:", widget=forms.Textarea(
+        attrs={'placeholder': 'Tu wpisz prace zwiazane z usuwaniem usterek'}))
 
     def clean(self):
         cleaned_data = self.cleaned_data
@@ -71,35 +79,44 @@ class LoginForm(forms.Form):
     username = forms.CharField(label="Nazwa użytkownika")
     password = forms.CharField(label="Hasło", widget=forms.PasswordInput)
 
-class RegistrationForm(forms.Form):
-    username=forms.CharField(label="Nazwa użytkownika")
-    password = forms.CharField(label="Password", widget=forms.PasswordInput)
-    email=forms.CharField(label="adres e-mail", widget=forms.EmailInput)
 
-SCOPE_SCHEDULE=(
+class RegistrationForm(forms.Form):
+    username = forms.CharField(label="Nazwa użytkownika")
+    password = forms.CharField(label="Password", widget=forms.PasswordInput)
+    email = forms.CharField(label="adres e-mail", widget=forms.EmailInput)
+
+
+SCOPE_SCHEDULE = (
 
     ("quarter", "kwartał"),
     ("end_of_year", "koniec roku"),
     ("only_next_year", "tylko przyszły rok")
 )
 
+
 class ScheduleForm(forms.Form):
-    scope=forms.ChoiceField(choices=SCOPE_SCHEDULE, label="Przeglądy ważne do:")
-    building=BuildingChoiceField(queryset=Buildings.objects.all(), required=False, empty_label='wszystkie', label="Budynek")
-
-
-
-class ContractorsChoiceMailField(forms.ModelChoiceField):
-    def label_from_instance(self, obj):
-        return obj.mail
+    scope = forms.ChoiceField(choices=SCOPE_SCHEDULE, label="Przeglądy ważne do:")
+    building = BuildingChoiceField(queryset=Buildings.objects.all(), required=False, empty_label='wszystkie',
+                                   label="Budynek")
 
 
 class ContractorsChoiceMailField(forms.ModelChoiceField):
     def label_from_instance(self, obj):
         return ("{} ----  {}".format(obj.name, obj.mail))
 
+
 class SendMailForm(forms.Form):
     address = ContractorsChoiceMailField(queryset=Contractors.objects.exclude(mail=''), label="Wykonawca")
-    subject=forms.CharField(label="Tytuł")
-    message=forms.CharField(widget=forms.Textarea, label="Treść zlecenia")
+    subject = forms.CharField(label="Tytuł")
+    message = forms.CharField(widget=forms.Textarea, label="Treść zlecenia")
+
+
+class SurveyForm(forms.ModelForm):
+    survey_date = forms.DateField(label="data przegladu", widget=forms.SelectDateWidget(years=range((year - 5), (year + 1))))
+    valid_date = forms.DateField(label="ważny do", widget=forms.SelectDateWidget(years=range((year - 5), (year + 7))))
+
+    class Meta:
+        model = Survey
+        fields = '__all__'
+
 
