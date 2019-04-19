@@ -18,7 +18,7 @@ from survey.filters import SurveyFilter
 from survey.forms import AddSurveyForm, AddContractorsForm, AddExecutionForm, LoginForm, RegistrationForm, \
     ScheduleForm, SendMailForm, SurveyForm
 from survey.functions import validity_date, length_valid, check_open_survey
-from survey.messages import text_message
+from survey.messages import text_message, delete_message
 from survey.models import Buildings, Survey, Contractors, Execution
 
 from weasyprint import HTML, CSS
@@ -225,12 +225,26 @@ class UpdateSurvey(UpdateView):
         return form
 
 
-class SurveyDelete(DeleteView):
+class SurveyDeleteView(DeleteView):
     model = Survey
     pk_url_kwarg = 'survey_id'
 
     def get_success_url(self):
         return "/surveys/"
+
+
+class ContractorDeleteView(View):
+    def get(self, request, contractor_id):
+        contractor = Contractors.objects.get(id=contractor_id)
+        surveys = Survey.objects.filter(contractor=contractor_id)
+        message=delete_message(surveys)
+        return render(request, "survey/contractors_confirm_delete.html",
+                      {'contractor': contractor, 'surveys': surveys, 'message': message})
+
+    def post(self, request, contractor_id):
+        delete_contractor = Contractors.objects.get(id=request.POST.get('delete'))
+        delete_contractor.delete()
+        return HttpResponseRedirect("/contractors")
 
 
 # =========================== FILES SECTION =====================

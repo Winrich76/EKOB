@@ -1,0 +1,35 @@
+
+{% extends 'base-one_column.html' %}
+{% load static %}
+{% load widget_tweaks %}
+
+{% block content %}
+     <div class="boxH"><h2>Kasowanie wykonawcy</h2></div>
+    <div class="bigCenter_box" >
+        <form method="post">{% csrf_token %}
+
+            <h3>Kasujesz wykonawcę: {{ contractor}} </h3>
+            <p class="info">{{ message.title }}</p>
+
+            <div>
+
+                 {% for survey in surveys %}
+                   <p>{{ survey }} {{ survey.get_kind_display }}</p>
+                    {% endfor %}
+            </div>
+            {% for info in message.info %}
+            <p class="info">{{ info }}</p>
+            {% endfor %}
+             <button type="submit" value="{{ contractor.id }}" name="delete">potwierdź</button>
+        </form>
+
+
+        <form method="get" action="../..">
+            <div>
+                <button type="submit" class="red" >anuluj</button>
+            </div>
+            <div style="clear:both"></div>
+        </form>
+    </div>
+{% endblock %}
+

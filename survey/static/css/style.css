@@ -157,6 +157,10 @@ span {
     text-align: center;
 }
 
+p.info {
+    font-size: 18px;
+}
+
 /*===============index/*/
 img {
   display: block;

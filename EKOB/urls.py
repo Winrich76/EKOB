@@ -18,9 +18,9 @@ from django.urls import path
 from django.conf import settings
 from django.conf.urls.static import static
 
-from survey.views import AddSurveyView, AddContractorView, ShowSurveysView, UpdateSurvey, SurveyDelete, \
+from survey.views import AddSurveyView, AddContractorView, ShowSurveysView, UpdateSurvey, SurveyDeleteView, \
     ShowContractorsView, AddExecutionView, ReadPdfView, LoginView, logout_view, RegistrationView, ScheduleView, \
-    display_survey_pdf_raport
+    display_survey_pdf_raport, ContractorDeleteView
 
 urlpatterns = [
                   path('admin/', admin.site.urls),
@@ -32,11 +32,12 @@ urlpatterns = [
                   path('addcontractor/', AddContractorView.as_view(), name='new_contractor'),
                   path('surveys/', ShowSurveysView.as_view(), name='list_surveys'),
                   path('surveys/<int:survey_id>/', UpdateSurvey.as_view()),
-                  path('surveys/delete/<int:survey_id>/', SurveyDelete.as_view()),
+                  path('surveys/delete/<int:survey_id>/', SurveyDeleteView.as_view()),
                   path('surveys/execution/<int:survey_id>/', AddExecutionView.as_view()),
                   path('surveys/pdf/<str:pdf>/', ReadPdfView.as_view(), name='show_pdf'),
                   path('surveys/report/', display_survey_pdf_raport, name='survey_report_pdf'),
                   path('contractors/', ShowContractorsView.as_view(), name='list_contractors'),
+                  path('contractors/delete/<int:contractor_id>/', ContractorDeleteView.as_view(), name='delete_contractors'),
                   path('schedule/', ScheduleView.as_view()),
 
 

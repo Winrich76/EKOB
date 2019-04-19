@@ -8,3 +8,16 @@ def text_message(surveys, today):
 
     text += 'z poważaniem'
     return text
+
+
+
+def delete_message(surveys):
+    message={
+        'title':'Do wykonawcy przypisane są następujące przeglądy:',
+                'info':['Zostaną skasowane razem z wykonawcą.',
+                        'Jeśli chcesz je zachować, kliknij anuluj i zmień przypisanego do nich wykonawcę.']
+    }
+    if not surveys:
+        message['title']='Brak w bazie przeglądów tego wykonawcy.'
+        message['info']=[]
+    return message

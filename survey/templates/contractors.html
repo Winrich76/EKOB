@@ -11,6 +11,7 @@
         <th>Branża</th>
         <th>Telefon</th>
         <th>Mail</th>
+        <th></th>
     </tr>
         {% for contractor in contractors %}
     <tr>
@@ -18,6 +19,7 @@
         <td>{{ contractor.get_industry_display}} </td>
         <td> {{ contractor.phone }}</td>
         <td> {{ contractor.mail }}</td>
+        <td><a href="../contractors/delete/{{ contractor.id }}"><button style="margin: 0px" >kasuj</button></a> </td>
     </tr>
 
     {% endfor %}
