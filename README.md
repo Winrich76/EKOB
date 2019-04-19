@@ -8,3 +8,6 @@ Update:11-04-2019.
 
 Update:15-04-2019.
 	improvement check_open_survey feature 
+
+Update:19-04-2019.
+	add contractions deletion 

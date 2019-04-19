@@ -12,10 +12,12 @@
             <p class="info">{{ message.title }}</p>
 
             <div>
-
-                 {% for survey in surveys %}
-                   <p>{{ survey }} {{ survey.get_kind_display }}</p>
+                <ol>
+                    {% for survey in surveys %}
+                   <li><p>{{ survey }} {{ survey.get_kind_display }}</p></li>
                     {% endfor %}
+                </ol>
+
             </div>
             {% for info in message.info %}
             <p class="info">{{ info }}</p>

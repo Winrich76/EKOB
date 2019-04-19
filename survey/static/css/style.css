@@ -92,7 +92,7 @@ body {
 
 /* ============== menu ================*/
 
-ul {
+ul.menu {
   list-style-type: none;
   margin: 0;
   padding: 0;
@@ -101,7 +101,7 @@ ul {
     font-size: 18px;
 }
 
-li {
+li.menu {
   float: left;
 }
 
