@@ -1,6 +1,7 @@
 import os
 
 from django.db import models
+from django.http import HttpResponseRedirect
 
 
 class Buildings(models.Model):
@@ -70,9 +71,10 @@ class Survey(models.Model):
         return self.name
 
     def delete(self):
-        os.remove(self.pdf.path)
+        if self.pdf:
+            if os.path.isfile(self.pdf.path):
+                os.remove(self.pdf.path)
         return super(Survey, self).delete()
-
 
 
 class Execution(models.Model):

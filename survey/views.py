@@ -12,7 +12,7 @@ from django.db.models.signals import post_delete
 from django.dispatch import receiver
 
 from django.template.loader import render_to_string
-from django.http import HttpResponse, HttpResponseRedirect
+from django.http import HttpResponse, HttpResponseRedirect, Http404
 from django.shortcuts import render
 from django.views import View
 from django.views.generic import UpdateView, DeleteView
@@ -262,10 +262,13 @@ class ContractorDeleteView(View):
 class ReadPdfView(View):
     def get(self, request, pdf):
         file_path = "media/pdf/" + pdf
-        with open(file_path, 'rb') as pdf_file:
-            response = HttpResponse(pdf_file.read(), content_type='application/pdf')
-            response['Content-Disposition'] = 'inline;filename=' + file_path
-        return response
+        try:
+            with open(file_path, 'rb') as pdf_file:
+                response = HttpResponse(pdf_file.read(), content_type='application/pdf')
+                response['Content-Disposition'] = 'inline;filename=' + file_path
+            return response
+        except FileNotFoundError:
+            return HttpResponse('Plik {} nie istnieje'.format(pdf))
 
 
 def display_survey_pdf_raport(request):
