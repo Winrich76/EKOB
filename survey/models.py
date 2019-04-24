@@ -1,3 +1,5 @@
+import os
+
 from django.db import models
 
 
@@ -66,6 +68,11 @@ class Survey(models.Model):
 
     def __str__(self):
         return self.name
+
+    def delete(self):
+        os.remove(self.pdf.path)
+        return super(Survey, self).delete()
+
 
 
 class Execution(models.Model):

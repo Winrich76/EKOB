@@ -1,4 +1,6 @@
+import os
 from calendar import monthrange
+
 
 from django.contrib.auth import authenticate, login, logout
 from django.contrib.auth.mixins import LoginRequiredMixin
@@ -6,6 +8,8 @@ from django.contrib.auth.models import User
 from django.core.files.storage import FileSystemStorage
 from django.core.mail import send_mail
 from django.core.paginator import Paginator, PageNotAnInteger, EmptyPage
+from django.db.models.signals import post_delete
+from django.dispatch import receiver
 
 from django.template.loader import render_to_string
 from django.http import HttpResponse, HttpResponseRedirect
@@ -237,7 +241,7 @@ class ContractorDeleteView(View):
     def get(self, request, contractor_id):
         contractor = Contractors.objects.get(id=contractor_id)
         surveys = Survey.objects.filter(contractor=contractor_id)
-        message=delete_message(surveys)
+        message = delete_message(surveys)
         return render(request, "survey/contractors_confirm_delete.html",
                       {'contractor': contractor, 'surveys': surveys, 'message': message})
 
@@ -245,6 +249,12 @@ class ContractorDeleteView(View):
         delete_contractor = Contractors.objects.get(id=request.POST.get('delete'))
         delete_contractor.delete()
         return HttpResponseRedirect("/contractors")
+
+    @receiver(post_delete, sender=Survey)
+    def auto_delete_file_on_delete(sender, instance, **kwargs):
+        if instance.pdf:
+            if os.path.isfile(instance.pdf.path):
+                os.remove(instance.pdf.path)
 
 
 # =========================== FILES SECTION =====================
