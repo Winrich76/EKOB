@@ -20,7 +20,7 @@ from django.conf.urls.static import static
 
 from survey.views import AddSurveyView, AddContractorView, ShowSurveysView, UpdateSurvey, SurveyDeleteView, \
     ShowContractorsView, AddExecutionView, ReadPdfView, LoginView, logout_view, RegistrationView, ScheduleView, \
-    display_survey_pdf_raport, ContractorDeleteView
+    display_survey_pdf_raport, ContractorDeleteView, AddRenovationsView
 
 urlpatterns = [
                   path('admin/', admin.site.urls),
@@ -39,6 +39,7 @@ urlpatterns = [
                   path('contractors/', ShowContractorsView.as_view(), name='list_contractors'),
                   path('contractors/delete/<int:contractor_id>/', ContractorDeleteView.as_view(), name='delete_contractors'),
                   path('schedule/', ScheduleView.as_view()),
+                  path('addrenovation', AddRenovationsView.as_view()),
 
 
 

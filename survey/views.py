@@ -1,7 +1,6 @@
 import os
 from calendar import monthrange
 
-
 from django.contrib.auth import authenticate, login, logout
 from django.contrib.auth.mixins import LoginRequiredMixin
 from django.contrib.auth.models import User
@@ -14,16 +13,17 @@ from django.dispatch import receiver
 from django.template.loader import render_to_string
 from django.http import HttpResponse, HttpResponseRedirect, Http404
 from django.shortcuts import render
+
 from django.views import View
 from django.views.generic import UpdateView, DeleteView
 import datetime
 
 from survey.filters import SurveyFilter
 from survey.forms import AddSurveyForm, AddContractorsForm, AddExecutionForm, LoginForm, RegistrationForm, \
-    ScheduleForm, SendMailForm, SurveyForm
+    ScheduleForm, SendMailForm, SurveyForm, RenovationsForm
 from survey.functions import validity_date, length_valid, check_open_survey
 from survey.messages import text_message, delete_message
-from survey.models import Buildings, Survey, Contractors, Execution
+from survey.models import Buildings, Survey, Contractors, Execution, Renovations
 
 from weasyprint import HTML, CSS
 
@@ -51,8 +51,8 @@ class AddSurveyView(View):
             is_open_value = check_open_survey(Survey, building, kind, survey_date)
 
             valid_date = validity_date(survey_date, length_valid(int(kind)))
-            Survey.objects.create(building=building, kind=kind, survey_date=survey_date, \
-                                  description=description, valid_date=valid_date, is_open=is_open_value, \
+            Survey.objects.create(building=building, kind=kind, survey_date=survey_date,
+                                  description=description, valid_date=valid_date, is_open=is_open_value,
                                   contractor=contractor, pdf=pdf)
 
             return HttpResponseRedirect('/surveys')
@@ -112,6 +112,44 @@ class AddExecutionView(View):
             return HttpResponseRedirect('/surveys')
         else:
             return render(request, "add_elements_surfey.html", {"form": form, 'h2_ctx': h2_ctx})
+
+
+class AddRenovationsView(View):
+    h2_ctx = 'Wprowadź nowy remont'
+
+    def get(self, request):
+        form = RenovationsForm()
+        return render(request, "add_renovation.html", {"form": form, 'h2_ctx': self.h2_ctx})
+
+    def post(self, request):
+        form = RenovationsForm(request.POST, request.FILES)
+
+        if form.is_valid():
+            building = form.cleaned_data['building']
+            description = form.cleaned_data['description']
+            contractor = form.cleaned_data['contractor']
+            contract_number = form.cleaned_data['contract_number']
+            contract_date = form.cleaned_data['contract_date']
+            contract_pdf = form.cleaned_data['contract_pdf']
+            building_permit_number = form.cleaned_data['building_permit_number']
+            building_permit_date = form.cleaned_data['building_permit_date']
+            permit_pdf = form.cleaned_data['permit_pdf']
+            start = form.cleaned_data['start']
+            termination = form.cleaned_data['termination']
+            termination_pdf = form.cleaned_data['termination_pdf']
+            guarantee = form.cleaned_data['guarantee']
+            deposit = form.cleaned_data['deposit']
+            deposit_kind = form.cleaned_data['deposit_kind']
+
+            Renovations.objects.create(building=building, description=description, contractor=contractor,
+                                       contract_number=contract_number, contract_date=contract_date,
+                                       contract_pdf=contract_pdf, building_permit_number=building_permit_number,
+                                       building_permit_date=building_permit_date, permit_pdf=permit_pdf, start=start,
+                                       termination=termination,  termination_pdf=termination_pdf,
+                                       guarantee=guarantee, deposit=deposit, deposit_kind=deposit_kind)
+            return HttpResponseRedirect('/surveys')
+        else:
+            return render(request, "add_renovation.html", {"form": form, 'h2_ctx': self.h2_ctx})
 
 
 class ShowSurveysView(LoginRequiredMixin, View):
@@ -319,3 +357,4 @@ class RegistrationView(View):
             email = form.cleaned_data['email']
             User.objects.create_user(username=username, password=password, email=email)
             return HttpResponseRedirect('/')
+

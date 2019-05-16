@@ -1,0 +1,32 @@
+{% extends 'base-one_column.html' %}
+{% load static %}
+{% load widget_tweaks %}
+
+{% block content %}
+    <div class="center_box">
+    <div class="boxH"><h2>{{ h2_ctx }}{{ init }}</h2></div>
+        <form action="" method="post" enctype="multipart/form-data">
+            {% csrf_token %}
+            {{ form.non_field_errors }}
+            {% for hidden_field in form.hidden_fields %}
+                {{ hidden_field.errors }}
+                {{ hidden_field }}
+            {% endfor %}
+
+          <table>
+                {% for field in form.visible_fields %}
+                  <tr>
+                      <th class="form_up">{{ field.label_tag }}</th>
+                        <td class="maxWidth">
+                            {{ field.errors }}
+                            {% render_field field  %}
+                        </td>
+                  </tr>
+                {% endfor %}
+          </table>
+        <button type="submit" >Dodaj</button>
+        </form>
+    <div style="clear:both"></div>
+    </div>
+
+{% endblock %}

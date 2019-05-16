@@ -2,7 +2,8 @@ from django import forms
 import datetime
 from django.core.exceptions import ValidationError
 
-from survey.models import Buildings, Contractors, KIND_SURVEY, INDUSTRY_CONTR, Survey, PdfFile
+from survey.models import Buildings, Contractors, KIND_SURVEY, INDUSTRY_CONTR, Survey, PdfFile, Renovations, \
+    KIND_DEPOSIT
 
 year = datetime.date.today().year
 
@@ -112,11 +113,43 @@ class SendMailForm(forms.Form):
 
 
 class SurveyForm(forms.ModelForm):
-    survey_date = forms.DateField(label="data przegladu", widget=forms.SelectDateWidget(years=range((year - 5), (year + 1))))
+    survey_date = forms.DateField(label="data przegladu",
+                                  widget=forms.SelectDateWidget(years=range((year - 5), (year + 1))))
     valid_date = forms.DateField(label="ważny do", widget=forms.SelectDateWidget(years=range((year - 5), (year + 7))))
 
     class Meta:
         model = Survey
         fields = '__all__'
 
+
+class RenovationsForm(forms.Form):
+    building = BuildingChoiceField(label="budynek", queryset=Buildings.objects.all(),
+                                   widget=forms.Select(attrs={'class': 'formIn'}))
+    description = forms.CharField(label="Zakres robót",
+                                  widget=forms.Textarea(attrs={'placeholder': 'Zakres robót'}))
+    contractor = forms.CharField(max_length=256, label='Wykonawca')
+    contract_number = forms.CharField(max_length=48,  label="Nr umowy")
+    contract_date = forms.DateField(label="Data umowy",
+                                    widget=forms.SelectDateWidget(years=range((year - 5), (year + 1)),
+                                                                  attrs={'class': 'formIn'}))
+
+    contract_pdf = forms.FileField(required=False, label="Umowa - pdf")
+    building_permit_number = forms.CharField(max_length=48, label="Nr pozwolenia na budowę")
+    building_permit_date = forms.DateField(label="Data pozwolenia ",
+                                           widget=forms.SelectDateWidget(years=range((year - 5), (year + 1)),
+                                                                         attrs={'class': 'formIn'}))
+    permit_pdf = forms.FileField(required=False, label="Pozwolenie - pdf")
+    start = forms.DateField(label='Data rozpoczęcia budowy',
+                            widget=forms.SelectDateWidget(years=range((year - 5), (year + 1)),
+                                                          attrs={'class': 'formIn'}))
+    termination = forms.DateField(label='Data protokołu odbioru',
+                                  widget=forms.SelectDateWidget(years=range((year - 5), (year + 1)),
+                                                                attrs={'class': 'formIn'}))
+    termination_pdf = forms.FileField(required=False, label="Protokół odbioru -pdf")
+
+    guarantee = forms.DateField(label='Gwarancja', widget=forms.SelectDateWidget(years=range((year - 5), (year + 1)),
+                                                                                 attrs={'class': 'formIn'}))
+
+    deposit = forms.FloatField(label='Kaucja')
+    deposit_kind = forms.ChoiceField(choices=KIND_DEPOSIT, label="Kaucja potracona z faktury końcowej")
 

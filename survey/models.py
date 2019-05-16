@@ -46,7 +46,7 @@ KIND_SURVEY = (
         (50, "5-elektryczny"),
         (51, "5-budowlany"),
     )),
-    ("Inne",(
+    ("Inne", (
         (21, 'gazex'),
         (1, 'separator')
     )),
@@ -88,3 +88,31 @@ class PdfFile(models.Model):
     pdf = models.FileField(upload_to='pdf')
 
 
+KIND_DEPOSIT = (
+    (True, 'Tak'),
+    (False, 'Nie')
+
+)
+
+
+class Renovations(models.Model):
+    building = models.ForeignKey(Buildings, on_delete=models.CASCADE, verbose_name="Budynek:")
+    description = models.TextField(verbose_name='Zakres remontu')
+    contractor = models.CharField(max_length=256, verbose_name='Wykonawca')
+    contract_number = models.CharField(max_length=48, null=True, verbose_name="Nr umowy")
+    contract_date = models.DateField(verbose_name="Data umowy")
+    contract_pdf = models.FileField(upload_to='renovation', null=True, verbose_name="Umowa - pdf")
+    building_permit_number = models.CharField(max_length=48, null=True, verbose_name="Nr pozwolenia na budowę")
+    building_permit_date = models.DateField(null=True, verbose_name="Data pozwolenia ")
+    permit_pdf = models.FileField(upload_to='renovation', null=True, verbose_name="Pozwolenie - pdf")
+    start = models.DateField(null=True, verbose_name='Data rozpoczęcia budowy')
+    termination = models.DateField(verbose_name='Data protokołu odbioru')
+    termination_pdf = models.FileField(upload_to='renovation', null=True, verbose_name="Protokół odbioru -pdf")
+    guarantee = models.DateField(verbose_name='Gwarancja')
+    deposit = models.FloatField(null=True, verbose_name='Kaucja')
+    deposit_kind = models.BooleanField(choices=KIND_DEPOSIT, verbose_name="Kaucja potrącona z faktury końcowej")
+
+
+RENOVATIONS_FIELD = ['building', 'description', 'contractor', 'contract_number', 'contract_date', 'contract_pdf',
+                     'building_permit_number', 'building_permit_date', 'permit_pdf', 'start', 'termination',
+                     'termination_pdf', 'guarantee', 'deposit', 'deposit_kind']
