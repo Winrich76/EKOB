@@ -147,7 +147,7 @@ class RenovationsForm(forms.Form):
                                                                 attrs={'class': 'formIn'}))
     termination_pdf = forms.FileField(required=False, label="Protokół odbioru -pdf")
 
-    guarantee = forms.DateField(label='Gwarancja', widget=forms.SelectDateWidget(years=range((year - 5), (year + 1)),
+    guarantee = forms.DateField(label='Gwarancja', widget=forms.SelectDateWidget(years=range((year), (year + 11)),
                                                                                  attrs={'class': 'formIn'}))
 
     deposit = forms.FloatField(label='Kaucja')

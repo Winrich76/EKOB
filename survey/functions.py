@@ -1,6 +1,8 @@
 from calendar import monthrange
 import datetime
 
+from django.http import HttpResponse
+
 
 def validity_date(date_s, valid):
     date_s = date_s - datetime.timedelta(days=1)
@@ -44,3 +46,12 @@ def check_open_survey(Object, building, kind, date_new_survey):
         return True
 
 
+def read_pdf(pdf, path_dic):
+    file_path = path_dic + pdf
+    try:
+        with open(file_path, 'rb') as pdf_file:
+            response = HttpResponse(pdf_file.read(), content_type='application/pdf')
+            response['Content-Disposition'] = 'inline;filename=' + file_path
+        return response
+    except FileNotFoundError:
+        return HttpResponse('Plik {} nie istnieje'.format(pdf))

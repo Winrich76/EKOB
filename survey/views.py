@@ -4,7 +4,6 @@ from calendar import monthrange
 from django.contrib.auth import authenticate, login, logout
 from django.contrib.auth.mixins import LoginRequiredMixin
 from django.contrib.auth.models import User
-from django.core.files.storage import FileSystemStorage
 from django.core.mail import send_mail
 from django.core.paginator import Paginator, PageNotAnInteger, EmptyPage
 from django.db.models.signals import post_delete
@@ -21,7 +20,7 @@ import datetime
 from survey.filters import SurveyFilter
 from survey.forms import AddSurveyForm, AddContractorsForm, AddExecutionForm, LoginForm, RegistrationForm, \
     ScheduleForm, SendMailForm, SurveyForm, RenovationsForm
-from survey.functions import validity_date, length_valid, check_open_survey
+from survey.functions import validity_date, length_valid, check_open_survey, read_pdf
 from survey.messages import text_message, delete_message
 from survey.models import Buildings, Survey, Contractors, Execution, Renovations
 
@@ -145,7 +144,7 @@ class AddRenovationsView(View):
                                        contract_number=contract_number, contract_date=contract_date,
                                        contract_pdf=contract_pdf, building_permit_number=building_permit_number,
                                        building_permit_date=building_permit_date, permit_pdf=permit_pdf, start=start,
-                                       termination=termination,  termination_pdf=termination_pdf,
+                                       termination=termination, termination_pdf=termination_pdf,
                                        guarantee=guarantee, deposit=deposit, deposit_kind=deposit_kind)
             return HttpResponseRedirect('/renovations')
         else:
@@ -184,17 +183,18 @@ class ShowContractorsView(View):
         contractors = Contractors.objects.all()
         return render(request, 'contractors.html', {"contractors": contractors})
 
+
 class ShowRenovationsView(View):
     def get(self, request):
-        renovations=Renovations.objects.all().order_by("building")
-        return render(request, 'renovations.html', {"renovations":renovations})
+        renovations = Renovations.objects.all().order_by("building")
+        return render(request, 'renovations.html', {"renovations": renovations})
+
 
 class ShowOneRenovationView(View):
 
     def get(self, request, renovation_id):
-        renovation=Renovations.objects.get(id=renovation_id)
-        return render(request, 'one_renovation.html', {"renovation":renovation})
-
+        renovation = Renovations.objects.get(id=renovation_id)
+        return render(request, 'one_renovation.html', {"renovation": renovation})
 
 
 class ScheduleView(View):
@@ -311,34 +311,20 @@ class ContractorDeleteView(View):
 
 class ReadPdfView(View):
     def get(self, request, pdf):
-        file_path = "media/pdf/" + pdf
-        try:
-            with open(file_path, 'rb') as pdf_file:
-                response = HttpResponse(pdf_file.read(), content_type='application/pdf')
-                response['Content-Disposition'] = 'inline;filename=' + file_path
-            return response
-        except FileNotFoundError:
-            return HttpResponse('Plik {} nie istnieje'.format(pdf))
+        path_dic = "media/pdf/"
+        return read_pdf(pdf, path_dic)
 
 
 class ReadRenovationPdfView(View):
     def get(self, request, pdf):
-        file_path = "media/renovation/" + pdf
-        try:
-            with open(file_path, 'rb') as pdf_file:
-                response = HttpResponse(pdf_file.read(), content_type='application/pdf')
-                response['Content-Disposition'] = 'inline;filename=' + file_path
-            return response
-        except FileNotFoundError:
-            return HttpResponse('Plik {} nie istnieje'.format(pdf))
+        path_dic = "media/renovation/"
+        return read_pdf(pdf, path_dic)
 
 
 def display_survey_pdf_raport(request):
-    fs = FileSystemStorage('media/pdf_report/')
-    with fs.open('survey_report.pdf') as pdf:
-        response = HttpResponse(pdf, content_type='application/pdf')
-        response['Content-Disposition'] = 'attachment; filename="survey_report.pdf"'
-    return response
+    path_dic = 'media/pdf_report/'
+    pdf = 'survey_report.pdf'
+    return read_pdf(pdf, path_dic)
 
 
 # ==================LOGIN SECTION=======================
@@ -381,4 +367,3 @@ class RegistrationView(View):
             email = form.cleaned_data['email']
             User.objects.create_user(username=username, password=password, email=email)
             return HttpResponseRedirect('/')
-
