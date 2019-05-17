@@ -147,7 +147,7 @@ class AddRenovationsView(View):
                                        building_permit_date=building_permit_date, permit_pdf=permit_pdf, start=start,
                                        termination=termination,  termination_pdf=termination_pdf,
                                        guarantee=guarantee, deposit=deposit, deposit_kind=deposit_kind)
-            return HttpResponseRedirect('/surveys')
+            return HttpResponseRedirect('/renovations')
         else:
             return render(request, "add_renovation.html", {"form": form, 'h2_ctx': self.h2_ctx})
 
@@ -183,6 +183,18 @@ class ShowContractorsView(View):
     def get(self, request):
         contractors = Contractors.objects.all()
         return render(request, 'contractors.html', {"contractors": contractors})
+
+class ShowRenovationsView(View):
+    def get(self, request):
+        renovations=Renovations.objects.all().order_by("building")
+        return render(request, 'renovations.html', {"renovations":renovations})
+
+class ShowOneRenovationView(View):
+
+    def get(self, request, renovation_id):
+        renovation=Renovations.objects.get(id=renovation_id)
+        return render(request, 'one_renovation.html', {"renovation":renovation})
+
 
 
 class ScheduleView(View):
@@ -300,6 +312,18 @@ class ContractorDeleteView(View):
 class ReadPdfView(View):
     def get(self, request, pdf):
         file_path = "media/pdf/" + pdf
+        try:
+            with open(file_path, 'rb') as pdf_file:
+                response = HttpResponse(pdf_file.read(), content_type='application/pdf')
+                response['Content-Disposition'] = 'inline;filename=' + file_path
+            return response
+        except FileNotFoundError:
+            return HttpResponse('Plik {} nie istnieje'.format(pdf))
+
+
+class ReadRenovationPdfView(View):
+    def get(self, request, pdf):
+        file_path = "media/renovation/" + pdf
         try:
             with open(file_path, 'rb') as pdf_file:
                 response = HttpResponse(pdf_file.read(), content_type='application/pdf')

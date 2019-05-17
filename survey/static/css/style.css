@@ -144,6 +144,13 @@ li.dropdown {
   display: block;
 }
 
+
+a.test {
+    text-decoration: none;
+    color: black;
+
+}
+
 /*=============== font style================*/
 
 h3 {
@@ -237,7 +244,7 @@ th.maxWidth{
 
 tr.change_tr:hover {
 	background-color: #6497b1;
-    color: white;
+    color: white !important;
     cursor: pointer;
 }
 

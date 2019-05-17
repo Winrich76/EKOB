@@ -1,0 +1,31 @@
+{% extends 'base-one_column.html' %}
+{% load static %}
+{% load widget_tweaks %}
+
+{% block content %}
+
+
+    <table class="maintable">
+    <tr>
+        <th>Budynek</th>
+        <th>Data rozpoczęcia </th>
+        <th>Data Zakończenia </th>
+        <th>Zakres robót</th>
+    </tr>
+        {% for renovation in renovations %}
+
+    <tr class="details change_tr">
+        <td><a class=test href='/renovations/{{ renovation.id }}'>{{ renovation.building }}   </a></td>
+        <td>{{ renovation.start}} </td>
+        <td> {{ renovation.termination }}</td>
+        <td> {{ renovation.description }}</td>
+
+    </tr>
+
+    {% endfor %}
+
+
+    </table>
+
+
+{% endblock %}
