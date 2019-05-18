@@ -14,8 +14,8 @@
     </tr>
         {% for renovation in renovations %}
 
-    <tr class="details change_tr">
-        <td><a class=test href='/renovations/{{ renovation.id }}'>{{ renovation.building }}   </a></td>
+    <tr class="details change_tr choice_tr" id="{{ renovation.id }}">
+        <td>{{ renovation.building }} </td>
         <td>{{ renovation.start}} </td>
         <td> {{ renovation.termination }}</td>
         <td> {{ renovation.description }}</td>
@@ -28,4 +28,8 @@
     </table>
 
 
+{% endblock %}
+
+{% block content_js_script %}
+    <script src={% static "js/renovations.js" %} ></script>
 {% endblock %}
