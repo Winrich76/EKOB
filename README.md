@@ -11,3 +11,6 @@ Update:15-04-2019.
 
 Update:19-04-2019.
 	add contractions deletion 
+
+Update:20-05-2019.
+	add renovations section

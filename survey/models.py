@@ -89,8 +89,8 @@ class PdfFile(models.Model):
 
 
 KIND_DEPOSIT = (
-    (True, 'Tak'),
-    (False, 'Nie')
+    (False, 'Nie'),
+    (True, 'Tak')
 
 )
 
@@ -105,12 +105,12 @@ class Renovations(models.Model):
     building_permit_number = models.CharField(max_length=48, null=True, verbose_name="Nr pozwolenia na budowę")
     building_permit_date = models.DateField(null=True, verbose_name="Data pozwolenia ")
     permit_pdf = models.FileField(upload_to='renovation', null=True, verbose_name="Pozwolenie - pdf")
-    start = models.DateField(null=True, verbose_name='Data rozpoczęcia budowy')
+    start = models.DateField(verbose_name='Data rozpoczęcia budowy')
     termination = models.DateField(verbose_name='Data protokołu odbioru')
     termination_pdf = models.FileField(upload_to='renovation', null=True, verbose_name="Protokół odbioru -pdf")
     guarantee = models.DateField(verbose_name='Gwarancja')
     deposit = models.FloatField(null=True, verbose_name='Kaucja')
-    deposit_kind = models.BooleanField(choices=KIND_DEPOSIT, verbose_name="Kaucja potrącona z faktury końcowej")
+    deposit_kind = models.BooleanField(null=True, choices=KIND_DEPOSIT, verbose_name="Kaucja potrącona z faktury końcowej")
 
 
 RENOVATIONS_FIELD = ['building', 'description', 'contractor', 'contract_number', 'contract_date', 'contract_pdf',

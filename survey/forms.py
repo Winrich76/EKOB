@@ -5,7 +5,8 @@ from django.core.exceptions import ValidationError
 from survey.models import Buildings, Contractors, KIND_SURVEY, INDUSTRY_CONTR, Survey, PdfFile, Renovations, \
     KIND_DEPOSIT
 
-year = datetime.date.today().year
+today = datetime.date.today()
+year = today.year
 
 
 class BuildingChoiceField(forms.ModelChoiceField):
@@ -62,7 +63,6 @@ class AddExecutionForm(forms.Form):
         date = cleaned_data.get("date")
         if not date:
             raise ValidationError("Niepoprawny format daty RRRR-MM-DD")
-        today = datetime.date.today()
         if date < survey.survey_date:
             raise ValidationError("Wpisana data protokołu naprawy jest wcześniejsza niż data przeglądu")
         elif date > today:
@@ -128,14 +128,14 @@ class RenovationsForm(forms.Form):
     description = forms.CharField(label="Zakres robót",
                                   widget=forms.Textarea(attrs={'placeholder': 'Zakres robót'}))
     contractor = forms.CharField(max_length=256, label='Wykonawca')
-    contract_number = forms.CharField(max_length=48,  label="Nr umowy")
+    contract_number = forms.CharField(required=False, max_length=48, label="Nr umowy")
     contract_date = forms.DateField(label="Data umowy",
                                     widget=forms.SelectDateWidget(years=range((year - 5), (year + 1)),
                                                                   attrs={'class': 'formIn'}))
 
     contract_pdf = forms.FileField(required=False, label="Umowa - pdf")
-    building_permit_number = forms.CharField(max_length=48, label="Nr pozwolenia na budowę")
-    building_permit_date = forms.DateField(label="Data pozwolenia ",
+    building_permit_number = forms.CharField(required=False, max_length=48, label="Nr pozwolenia na budowę")
+    building_permit_date = forms.DateField(required=False, label="Data pozwolenia ",
                                            widget=forms.SelectDateWidget(years=range((year - 5), (year + 1)),
                                                                          attrs={'class': 'formIn'}))
     permit_pdf = forms.FileField(required=False, label="Pozwolenie - pdf")
@@ -147,9 +147,19 @@ class RenovationsForm(forms.Form):
                                                                 attrs={'class': 'formIn'}))
     termination_pdf = forms.FileField(required=False, label="Protokół odbioru -pdf")
 
-    guarantee = forms.DateField(label='Gwarancja', widget=forms.SelectDateWidget(years=range((year), (year + 11)),
+    guarantee = forms.DateField(label='Gwarancja', widget=forms.SelectDateWidget(years=range((year), (year + 16)),
                                                                                  attrs={'class': 'formIn'}))
 
     deposit = forms.FloatField(label='Kaucja')
     deposit_kind = forms.ChoiceField(choices=KIND_DEPOSIT, label="Kaucja potracona z faktury końcowej")
 
+    def clean(self):
+        cleaned_data = self.cleaned_data
+        start = cleaned_data.get("start")
+        termination = cleaned_data.get("termination")
+        contract_date = cleaned_data.get("contract_date")
+        if start > today or termination > today or contract_date > today:
+            raise ValidationError("Wprowadzona data jeszcze nie nastąpiła")
+        if start > termination:
+            raise ValidationError("Wprowadzona data rozpoczęcia robót jest później niż data zakończenia")
+        return cleaned_data
