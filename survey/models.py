@@ -88,31 +88,46 @@ class PdfFile(models.Model):
     pdf = models.FileField(upload_to='pdf')
 
 
-KIND_DEPOSIT = (
-    (False, 'Nie'),
-    (True, 'Tak')
-
-)
 
 
 class Renovations(models.Model):
     building = models.ForeignKey(Buildings, on_delete=models.CASCADE, verbose_name="Budynek:")
     description = models.TextField(verbose_name='Zakres remontu')
+
+
+KIND_CONTRACT=(
+    ('contract', 'Umowa'),
+    ('annex', 'Aneks'),
+    ('permit', 'zezwolenie')
+
+)
+
+
+
+def get_upload_path(instance, filename):
+    return 'renovation/{}/{}'.format(instance.renovation.id, filename)
+
+
+class ContractRenovation(models.Model):
+
+    renovation = models.ForeignKey(Renovations, on_delete=models.CASCADE)
+    kind=models.CharField(choices=KIND_CONTRACT, max_length=12)
+    number = models.CharField(max_length=48, null=True, verbose_name="Nr umowy")
+    date = models.DateField(verbose_name="Data umowy")
+    description = models.TextField(verbose_name='Przedmiot umowy/pozwolenia')
+    contract_pdf = models.FileField(upload_to=get_upload_path, null=True, verbose_name="Umowa - pdf")
+
+
+
+
+
+class ExecutRenovation(models.Model):
     contractor = models.CharField(max_length=256, verbose_name='Wykonawca')
-    contract_number = models.CharField(max_length=48, null=True, verbose_name="Nr umowy")
-    contract_date = models.DateField(verbose_name="Data umowy")
-    contract_pdf = models.FileField(upload_to='renovation', null=True, verbose_name="Umowa - pdf")
-    building_permit_number = models.CharField(max_length=48, null=True, verbose_name="Nr pozwolenia na budowę")
-    building_permit_date = models.DateField(null=True, verbose_name="Data pozwolenia ")
-    permit_pdf = models.FileField(upload_to='renovation', null=True, verbose_name="Pozwolenie - pdf")
+    surveyor = models.CharField(max_length=256, verbose_name='Inspector', null=True)
     start = models.DateField(verbose_name='Data rozpoczęcia budowy')
     termination = models.DateField(verbose_name='Data protokołu odbioru')
-    termination_pdf = models.FileField(upload_to='renovation', null=True, verbose_name="Protokół odbioru -pdf")
-    guarantee = models.DateField(verbose_name='Gwarancja')
-    deposit = models.FloatField(null=True, verbose_name='Kaucja')
-    deposit_kind = models.BooleanField(null=True, choices=KIND_DEPOSIT, verbose_name="Kaucja potrącona z faktury końcowej")
+    termination_pdf = models.FileField(upload_to=get_upload_path, null=True, verbose_name="Protokół odbioru -pdf")
+    description = models.TextField(null=True, verbose_name='uwagi')
+    renovation = models.OneToOneField(Renovations, on_delete=models.CASCADE, primary_key=True)
 
 
-RENOVATIONS_FIELD = ['building', 'description', 'contractor', 'contract_number', 'contract_date', 'contract_pdf',
-                     'building_permit_number', 'building_permit_date', 'permit_pdf', 'start', 'termination',
-                     'termination_pdf', 'guarantee', 'deposit', 'deposit_kind']

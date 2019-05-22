@@ -1,5 +1,10 @@
 import pytest
 import datetime
+import pytest_django
+
+
+from django.urls import reverse, resolve
+
 from survey.functions import validity_date
 
 
@@ -13,3 +18,9 @@ from survey.functions import validity_date
 ))
 def test_date(date, period, expected):
     assert validity_date(date, period) == expected
+
+def test_url_update_survey():
+    path = reverse('update_survey', kwargs={'survey_id':4})
+    assert resolve(path).view_name=='update_survey'
+
+# @pytest.mark.django_db

@@ -19,10 +19,10 @@ import datetime
 
 from survey.filters import SurveyFilter
 from survey.forms import AddSurveyForm, AddContractorsForm, AddExecutionForm, LoginForm, RegistrationForm, \
-    ScheduleForm, SendMailForm, SurveyForm, RenovationsForm
+    ScheduleForm, SendMailForm, SurveyForm, RenovationsForm, ContractRenovationForm, ExecutRenovationForm
 from survey.functions import validity_date, length_valid, check_open_survey, read_pdf
 from survey.messages import text_message, delete_message
-from survey.models import Buildings, Survey, Contractors, Execution, Renovations
+from survey.models import Buildings, Survey, Contractors, Execution, Renovations, ContractRenovation, ExecutRenovation
 
 from weasyprint import HTML, CSS
 
@@ -126,29 +126,59 @@ class AddRenovationsView(View):
         if form.is_valid():
             building = form.cleaned_data['building']
             description = form.cleaned_data['description']
-            contractor = form.cleaned_data['contractor']
-            contract_number = form.cleaned_data['contract_number']
-            contract_date = form.cleaned_data['contract_date']
-            contract_pdf = form.cleaned_data['contract_pdf']
-            building_permit_number = form.cleaned_data['building_permit_number']
-            building_permit_date = form.cleaned_data['building_permit_date']
-            permit_pdf = form.cleaned_data['permit_pdf']
-            start = form.cleaned_data['start']
-            termination = form.cleaned_data['termination']
-            termination_pdf = form.cleaned_data['termination_pdf']
-            guarantee = form.cleaned_data['guarantee']
-            deposit = form.cleaned_data['deposit']
-            deposit_kind = form.cleaned_data['deposit_kind']
-
-            Renovations.objects.create(building=building, description=description, contractor=contractor,
-                                       contract_number=contract_number, contract_date=contract_date,
-                                       contract_pdf=contract_pdf, building_permit_number=building_permit_number,
-                                       building_permit_date=building_permit_date, permit_pdf=permit_pdf, start=start,
-                                       termination=termination, termination_pdf=termination_pdf,
-                                       guarantee=guarantee, deposit=deposit, deposit_kind=deposit_kind)
+            new_renovation = Renovations.objects.create(building=building, description=description)
+            os.mkdir(os.path.join('media/renovation', str(new_renovation.id)))
             return HttpResponseRedirect('/renovations')
         else:
             return render(request, "add_renovation.html", {"form": form, 'h2_ctx': self.h2_ctx})
+
+
+class AddContractRenovationView(View):
+
+    def get(self, request, renovation_id):
+
+        form = ContractRenovationForm(initial={"renovation": renovation_id})
+        return render(request, "add_renovation.html", {'form': form})
+
+    def post(self, request, renovation_id):
+        form = ContractRenovationForm(request.POST, request.FILES)
+
+        if form.is_valid():
+            renovation = form.cleaned_data['renovation']
+            kind = form.cleaned_data['kind']
+            number = form.cleaned_data['number']
+            date = form.cleaned_data['date']
+            description = form.cleaned_data['description']
+            contract_pdf = form.cleaned_data['contract_pdf']
+
+            ContractRenovation.objects.create(renovation_id=renovation, kind=kind, number=number, date=date,
+                                              description=description, contract_pdf=contract_pdf)
+            return HttpResponseRedirect('/renovations')
+        else:
+            return render(request, "add_renovation.html", {"form": form})
+
+
+class AddExecutRenovationView(View):
+    def get(self, request, renovation_id):
+        form = ExecutRenovationForm(initial={"renovation": renovation_id})
+        return render(request, 'add_renovation.html', {'form': form})
+
+    def post(self, request, renovation_id):
+        form = ExecutRenovationForm(request.POST, request.FILES)
+        if form.is_valid():
+            contractor = form.cleaned_data['contractor']
+            surveyor = form.cleaned_data['surveyor']
+            start = form.cleaned_data['start']
+            termination = form.cleaned_data['termination']
+            termination_pdf = form.cleaned_data['termination_pdf']
+            description = form.cleaned_data['description']
+            renovation = form.cleaned_data['renovation']
+            ExecutRenovation.objects.create(contractor=contractor, surveyor=surveyor, start=start,
+                                            termination=termination, termination_pdf=termination_pdf,
+                                            description=description, renovation_id=renovation)
+            return HttpResponseRedirect('/renovations')
+        else:
+            return render(request, "add_renovation.html", {"form": form})
 
 
 class ShowSurveysView(LoginRequiredMixin, View):
@@ -194,7 +224,8 @@ class ShowOneRenovationView(View):
 
     def get(self, request, renovation_id):
         renovation = Renovations.objects.get(id=renovation_id)
-        return render(request, 'one_renovation.html', {"renovation": renovation})
+        contracts=ContractRenovation.objects.all().filter(renovation_id=renovation_id)
+        return render(request, 'one_renovation.html', {"renovation": renovation, 'contracts':contracts})
 
 
 class ScheduleView(View):

@@ -9,27 +9,13 @@
         <p>dla budynku: {{ renovation.building }}</p>
         <p>Zakres robót:</p>
         <p>{{ renovation.description }}</p>
-        <p>Podstawa wykonania:</p>
-        <p>Umowa nr {{ renovation.contract_number }} z dnia {{ renovation.contract_date }}</p>
-        <p>Pozwolenie na budowę nr {{ renovation.building_permit_number }} z dnia {{ renovation.building_permit_date }}</p>
+        <p>Umowy i zezwolenia</p>
+        {% for contract in contracts %}
+            <p>numer {{ contract.number }} z dnia {{ contract.date }}</p>
+        {% endfor %}
 
-        <p style="clear:both"></p>
-        <p>Wykonawca: {{ renovation.contractor }}</p>
-        <p>Data wprowadzenia na budowę {{ renovation.start }}, data protokołu odbioru {{ renovation.termination }}</p>
-        <p>Gwarancja do {{ renovation.guarantee }}</p>
-        <p>Kaucja {{ renovation.deposit }} uwględniona w fakturze końcowej {{ renovation.get_deposit_kind_display }}</p>
-
-        {% if renovation.permit_pdf %}
-            <a href="{{ renovation.permit_pdf }}"><button class="icon">pozwolenie PDF</button></a>
-        {% endif %}
-        {% if renovation.contract_pdf %}
-            <a href="{{ renovation.contract_pdf }}"><button class="icon">umowa PDF</button></a>
-        {% endif %}
-        {% if renovation.termination_pdf %}
-            <a href="{{ renovation.termination_pdf }}"><button class="icon">Odbiór PDF</button></a>
-        {% endif %}
-        <p style="clear:both"></p>
-
+            <a href="contracts/{{ renovation.id}}">dodaj umowę</a>
+            <a href="execution/{{ renovation.id}}">dodaj wykonanie</a>
     </div>
 
 

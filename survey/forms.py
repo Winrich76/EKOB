@@ -3,7 +3,7 @@ import datetime
 from django.core.exceptions import ValidationError
 
 from survey.models import Buildings, Contractors, KIND_SURVEY, INDUSTRY_CONTR, Survey, PdfFile, Renovations, \
-    KIND_DEPOSIT
+    KIND_CONTRACT
 
 today = datetime.date.today()
 year = today.year
@@ -127,18 +127,30 @@ class RenovationsForm(forms.Form):
                                    widget=forms.Select(attrs={'class': 'formIn'}))
     description = forms.CharField(label="Zakres robót",
                                   widget=forms.Textarea(attrs={'placeholder': 'Zakres robót'}))
-    contractor = forms.CharField(max_length=256, label='Wykonawca')
-    contract_number = forms.CharField(required=False, max_length=48, label="Nr umowy")
-    contract_date = forms.DateField(label="Data umowy",
-                                    widget=forms.SelectDateWidget(years=range((year - 5), (year + 1)),
-                                                                  attrs={'class': 'formIn'}))
 
+
+class ContractRenovationForm(forms.Form):
+    renovation = forms.IntegerField()
+    kind = forms.ChoiceField(choices=KIND_CONTRACT, label='rodzaj dokumentu')
+    number = forms.CharField(max_length=48, required=True, label="Nr umowy")
+    date = forms.DateField(label="Data umowy",
+                           widget=forms.SelectDateWidget(years=range((year - 5), (year + 1)),
+                                                         attrs={'class': 'formIn'}))
+    description = forms.CharField(label="Przedmiot umowy/zezwolenia",
+                                  widget=forms.Textarea(attrs={'placeholder': 'Przedmiot umowy/zezwolenia'}))
     contract_pdf = forms.FileField(required=False, label="Umowa - pdf")
-    building_permit_number = forms.CharField(required=False, max_length=48, label="Nr pozwolenia na budowę")
-    building_permit_date = forms.DateField(required=False, label="Data pozwolenia ",
-                                           widget=forms.SelectDateWidget(years=range((year - 5), (year + 1)),
-                                                                         attrs={'class': 'formIn'}))
-    permit_pdf = forms.FileField(required=False, label="Pozwolenie - pdf")
+
+    def clean(self):
+        cleaned_data = self.cleaned_data
+        contract_date = cleaned_data.get("contract_date")
+        if contract_date > today:
+            raise ValidationError("Wprowadzona data jeszcze nie nastąpiła")
+        return cleaned_data
+
+
+class ExecutRenovationForm(forms.Form):
+    contractor = forms.CharField(max_length=256, label='Wykonawca')
+    surveyor = forms.CharField(max_length=256, required=False, label='Inspector')
     start = forms.DateField(label='Data rozpoczęcia budowy',
                             widget=forms.SelectDateWidget(years=range((year - 5), (year + 1)),
                                                           attrs={'class': 'formIn'}))
@@ -146,19 +158,16 @@ class RenovationsForm(forms.Form):
                                   widget=forms.SelectDateWidget(years=range((year - 5), (year + 1)),
                                                                 attrs={'class': 'formIn'}))
     termination_pdf = forms.FileField(required=False, label="Protokół odbioru -pdf")
-
-    guarantee = forms.DateField(label='Gwarancja', widget=forms.SelectDateWidget(years=range((year), (year + 16)),
-                                                                                 attrs={'class': 'formIn'}))
-
-    deposit = forms.FloatField(label='Kaucja')
-    deposit_kind = forms.ChoiceField(choices=KIND_DEPOSIT, label="Kaucja potracona z faktury końcowej")
+    description = forms.CharField(label="Uwagi", required=False,
+                                  widget=forms.Textarea(
+                                      attrs={'placeholder': 'uwagi do przebiegu budowy/protokołu odbioru'}))
+    renovation = forms.IntegerField()
 
     def clean(self):
         cleaned_data = self.cleaned_data
         start = cleaned_data.get("start")
         termination = cleaned_data.get("termination")
-        contract_date = cleaned_data.get("contract_date")
-        if start > today or termination > today or contract_date > today:
+        if start > today or termination > today:
             raise ValidationError("Wprowadzona data jeszcze nie nastąpiła")
         if start > termination:
             raise ValidationError("Wprowadzona data rozpoczęcia robót jest później niż data zakończenia")

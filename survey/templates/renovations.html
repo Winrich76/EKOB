@@ -8,16 +8,12 @@
     <table class="maintable">
     <tr>
         <th>Budynek</th>
-        <th>Data rozpoczęcia </th>
-        <th>Data Zakończenia </th>
         <th>Zakres robót</th>
     </tr>
         {% for renovation in renovations %}
 
     <tr class="details change_tr choice_tr" id="{{ renovation.id }}">
         <td>{{ renovation.building }} </td>
-        <td>{{ renovation.start}} </td>
-        <td> {{ renovation.termination }}</td>
         <td> {{ renovation.description }}</td>
 
     </tr>

@@ -21,7 +21,7 @@ from django.conf.urls.static import static
 from survey.views import AddSurveyView, AddContractorView, ShowSurveysView, UpdateSurvey, SurveyDeleteView, \
     ShowContractorsView, AddExecutionView, ReadPdfView, LoginView, logout_view, RegistrationView, ScheduleView, \
     display_survey_pdf_raport, ContractorDeleteView, AddRenovationsView, ShowRenovationsView, ShowOneRenovationView, \
-    ReadRenovationPdfView
+    ReadRenovationPdfView, AddContractRenovationView, AddExecutRenovationView
 
 urlpatterns = [
                   path('admin/', admin.site.urls),
@@ -32,7 +32,7 @@ urlpatterns = [
                   path('addsurvey/', AddSurveyView.as_view(), name='new_survey'),
                   path('addcontractor/', AddContractorView.as_view(), name='new_contractor'),
                   path('surveys/', ShowSurveysView.as_view(), name='list_surveys'),
-                  path('surveys/<int:survey_id>/', UpdateSurvey.as_view()),
+                  path('surveys/<int:survey_id>/', UpdateSurvey.as_view(), name='update_survey'),
                   path('surveys/delete/<int:survey_id>/', SurveyDeleteView.as_view()),
                   path('surveys/execution/<int:survey_id>/', AddExecutionView.as_view()),
                   path('surveys/pdf/<str:pdf>/', ReadPdfView.as_view(), name='show_pdf'),
@@ -43,6 +43,12 @@ urlpatterns = [
                   path('addrenovation/', AddRenovationsView.as_view()),
                   path('renovations/', ShowRenovationsView.as_view()),
                   path('renovations/<int:renovation_id>', ShowOneRenovationView.as_view()),
+                  path('renovations/contracts/<int:renovation_id>', AddContractRenovationView.as_view()),
+                  path('renovations/execution/<int:renovation_id>', AddExecutRenovationView.as_view()),
+
+
+
+
                   path('renovations/renovation/<str:pdf>/', ReadRenovationPdfView.as_view()),
 
 
