@@ -130,7 +130,7 @@ class RenovationsForm(forms.Form):
 
 
 class ContractRenovationForm(forms.Form):
-    renovation = forms.IntegerField()
+    renovation = forms.IntegerField(widget=forms.HiddenInput)
     kind = forms.ChoiceField(choices=KIND_CONTRACT, label='rodzaj dokumentu')
     number = forms.CharField(max_length=48, required=True, label="Nr umowy")
     date = forms.DateField(label="Data umowy",
@@ -142,8 +142,8 @@ class ContractRenovationForm(forms.Form):
 
     def clean(self):
         cleaned_data = self.cleaned_data
-        contract_date = cleaned_data.get("contract_date")
-        if contract_date > today:
+        date = cleaned_data.get("date")
+        if date > today:
             raise ValidationError("Wprowadzona data jeszcze nie nastąpiła")
         return cleaned_data
 
@@ -161,7 +161,7 @@ class ExecutRenovationForm(forms.Form):
     description = forms.CharField(label="Uwagi", required=False,
                                   widget=forms.Textarea(
                                       attrs={'placeholder': 'uwagi do przebiegu budowy/protokołu odbioru'}))
-    renovation = forms.IntegerField()
+    renovation = forms.IntegerField(widget=forms.HiddenInput)
 
     def clean(self):
         cleaned_data = self.cleaned_data

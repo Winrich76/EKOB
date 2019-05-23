@@ -45,14 +45,7 @@ urlpatterns = [
                   path('renovations/<int:renovation_id>', ShowOneRenovationView.as_view()),
                   path('renovations/contracts/<int:renovation_id>', AddContractRenovationView.as_view()),
                   path('renovations/execution/<int:renovation_id>', AddExecutRenovationView.as_view()),
-
-
-
-
-                  path('renovations/renovation/<str:pdf>/', ReadRenovationPdfView.as_view()),
-
-
-
+                  path('renovations/renovation/<int:renovation_id>/<str:pdf>/', ReadRenovationPdfView.as_view()),
 
 
               ] + static(settings.MEDIA_URL, document_root=settings.MEDIA_ROOT)

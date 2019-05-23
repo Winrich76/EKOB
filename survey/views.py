@@ -136,12 +136,17 @@ class AddRenovationsView(View):
 class AddContractRenovationView(View):
 
     def get(self, request, renovation_id):
-
+        renovation = Renovations.objects.get(id=renovation_id)
+        h2_ctx = 'Dodaj umowę/zezwolenie dla remontu {}... w budynku {}'.format(renovation.description[:25],
+                                                                                renovation.building)
         form = ContractRenovationForm(initial={"renovation": renovation_id})
-        return render(request, "add_renovation.html", {'form': form})
+        return render(request, "add_renovation.html", {'form': form, 'h2_ctx': h2_ctx})
 
     def post(self, request, renovation_id):
         form = ContractRenovationForm(request.POST, request.FILES)
+        renovation = Renovations.objects.get(id=renovation_id)
+        h2_ctx = 'Dodaj umowę/zezwolenie dla remontu {}... w budynku {}'.format(renovation.description[:25],
+                                                                                renovation.building)
 
         if form.is_valid():
             renovation = form.cleaned_data['renovation']
@@ -153,18 +158,27 @@ class AddContractRenovationView(View):
 
             ContractRenovation.objects.create(renovation_id=renovation, kind=kind, number=number, date=date,
                                               description=description, contract_pdf=contract_pdf)
-            return HttpResponseRedirect('/renovations')
+            return HttpResponseRedirect('/renovations/' + str(renovation))
         else:
-            return render(request, "add_renovation.html", {"form": form})
+            return render(request, "add_renovation.html", {"form": form, 'h2_ctx': h2_ctx})
 
 
 class AddExecutRenovationView(View):
     def get(self, request, renovation_id):
-        form = ExecutRenovationForm(initial={"renovation": renovation_id})
-        return render(request, 'add_renovation.html', {'form': form})
+        if ExecutRenovation.objects.all().filter(renovation_id=renovation_id).exists():
+            return HttpResponse('Realizacja dla tego remontu została już wprowadzona. możesz edytować dane')
+        else:
+            form = ExecutRenovationForm(initial={"renovation": renovation_id})
+            renovation = Renovations.objects.get(id=renovation_id)
+            h2_ctx = 'Realizacja remontu {}... w budynku {}'.format(renovation.description[:25],
+                                                                    renovation.building)
+            return render(request, 'add_renovation.html', {'form': form, 'h2_ctx': h2_ctx})
 
     def post(self, request, renovation_id):
         form = ExecutRenovationForm(request.POST, request.FILES)
+        renovation = Renovations.objects.get(id=renovation_id)
+        h2_ctx = 'Realizacja remontu {}... w budynku {}'.format(renovation.description[:25],
+                                                                renovation.building)
         if form.is_valid():
             contractor = form.cleaned_data['contractor']
             surveyor = form.cleaned_data['surveyor']
@@ -176,9 +190,9 @@ class AddExecutRenovationView(View):
             ExecutRenovation.objects.create(contractor=contractor, surveyor=surveyor, start=start,
                                             termination=termination, termination_pdf=termination_pdf,
                                             description=description, renovation_id=renovation)
-            return HttpResponseRedirect('/renovations')
+            return HttpResponseRedirect('/renovations/' + str(renovation))
         else:
-            return render(request, "add_renovation.html", {"form": form})
+            return render(request, "add_renovation.html", {"form": form, 'h2_ctx': h2_ctx})
 
 
 class ShowSurveysView(LoginRequiredMixin, View):
@@ -224,8 +238,16 @@ class ShowOneRenovationView(View):
 
     def get(self, request, renovation_id):
         renovation = Renovations.objects.get(id=renovation_id)
-        contracts=ContractRenovation.objects.all().filter(renovation_id=renovation_id)
-        return render(request, 'one_renovation.html', {"renovation": renovation, 'contracts':contracts})
+        try:
+            contracts = ContractRenovation.objects.all().filter(renovation_id=renovation_id).order_by('date')
+        except:
+            contracts = False
+        try:
+            execution = ExecutRenovation.objects.get(renovation_id=renovation_id)
+        except:
+            execution = False
+        return render(request, 'one_renovation.html',
+                      {"renovation": renovation, 'contracts': contracts, 'execution': execution})
 
 
 class ScheduleView(View):
@@ -347,8 +369,8 @@ class ReadPdfView(View):
 
 
 class ReadRenovationPdfView(View):
-    def get(self, request, pdf):
-        path_dic = "media/renovation/"
+    def get(self, request, pdf, renovation_id):
+        path_dic = "media/renovation/{}/".format(renovation_id)
         return read_pdf(pdf, path_dic)
 
 

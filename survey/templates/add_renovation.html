@@ -4,7 +4,7 @@
 
 {% block content %}
     <div class="center_box">
-    <div class="boxH"><h2>{{ h2_ctx }}{{ init }}</h2></div>
+    <div class="boxH"><h3>{{ h2_ctx }}{{ init }}</h3></div>
         <form action="" method="post" enctype="multipart/form-data">
             {% csrf_token %}
             {{ form.non_field_errors }}
