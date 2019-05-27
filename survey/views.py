@@ -11,7 +11,7 @@ from django.dispatch import receiver
 
 from django.template.loader import render_to_string
 from django.http import HttpResponse, HttpResponseRedirect, Http404
-from django.shortcuts import render
+from django.shortcuts import render, get_object_or_404
 
 from django.views import View
 from django.views.generic import UpdateView, DeleteView
@@ -93,7 +93,7 @@ class AddContractorView(View):
 class AddExecutionView(View):
 
     def get(self, request, survey_id):
-        initial_survey = Survey.objects.get(id=survey_id)
+        initial_survey = get_object_or_404(Survey, id=survey_id)
         form = AddExecutionForm(initial={"survey": initial_survey})
         h2_ctx = 'Wprowadź wykonanie zaleceń do przegladu: {}'.format(initial_survey)
         return render(request, "add_elements_surfey.html", {"form": form, 'h2_ctx': h2_ctx})
@@ -136,7 +136,7 @@ class AddRenovationsView(View):
 class AddContractRenovationView(View):
 
     def get(self, request, renovation_id):
-        renovation = Renovations.objects.get(id=renovation_id)
+        renovation = get_object_or_404(Renovations, id=renovation_id)
         h2_ctx = 'Dodaj umowę/zezwolenie dla remontu {}... w budynku {}'.format(renovation.description[:25],
                                                                                 renovation.building)
         form = ContractRenovationForm(initial={"renovation": renovation_id})
@@ -168,8 +168,8 @@ class AddExecutRenovationView(View):
         if ExecutRenovation.objects.all().filter(renovation_id=renovation_id).exists():
             return HttpResponse('Realizacja dla tego remontu została już wprowadzona. możesz edytować dane')
         else:
+            renovation = get_object_or_404(Renovations, id=renovation_id)
             form = ExecutRenovationForm(initial={"renovation": renovation_id})
-            renovation = Renovations.objects.get(id=renovation_id)
             h2_ctx = 'Realizacja remontu {}... w budynku {}'.format(renovation.description[:25],
                                                                     renovation.building)
             return render(request, 'add_renovation.html', {'form': form, 'h2_ctx': h2_ctx})
@@ -237,7 +237,7 @@ class ShowRenovationsView(View):
 class ShowOneRenovationView(View):
 
     def get(self, request, renovation_id):
-        renovation = Renovations.objects.get(id=renovation_id)
+        renovation = get_object_or_404(Renovations, id=renovation_id)
         try:
             contracts = ContractRenovation.objects.all().filter(renovation_id=renovation_id).order_by('date')
         except:
@@ -342,7 +342,7 @@ class SurveyDeleteView(DeleteView):
 
 class ContractorDeleteView(View):
     def get(self, request, contractor_id):
-        contractor = Contractors.objects.get(id=contractor_id)
+        contractor = get_object_or_404(Contractors, id=contractor_id)
         surveys = Survey.objects.filter(contractor=contractor_id)
         message = delete_message(surveys)
         return render(request, "survey/contractors_confirm_delete.html",

@@ -42,7 +42,11 @@
         <p>Data odbioru robót: {{ execution.termination }}</p>
         <p>Uwagi: {{ execution.description }}</p>
         {% if execution.termination_pdf %}
-            <p>Protokół odbioru: <a href="{{ execution.termination_pdf }}"><button class="icon">PDF</button></a> </p>
+            <p style="float: left">Protokół odbioru: </p>
+            <p ><a href="{{ execution.termination_pdf }}"><button class="icon">PDF</button></a></p>
+
+        <p style="clear:both"></p>
+
         {% endif %}
     {% else %}<p>Nie wprowadzono danych.</p>
     {% endif %}
@@ -51,6 +55,7 @@
     {% if not execution %}
             <a href="execution/{{ renovation.id}}"><button type="submit" >Dodaj realizację</button></a>
     {% endif %}
+    <div style="clear:both"></div>
     </div>
 
 
