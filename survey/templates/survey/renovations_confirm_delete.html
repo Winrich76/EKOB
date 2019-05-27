@@ -8,13 +8,13 @@
     <div class="bigCenter_box" >
         <form method="post">{% csrf_token %}
 
-            <h3>Kasujesz przegląd: {{ object.get_kind_display}} </h3><h3>Dla budynku: {{ object.building.name  }}</h3>
+            <h3>Kasujesz remont: {{ renovation.building}} </h3>
 
              <button type="submit">potwierdź</button>
         </form>
 
 
-        <form method="get" action="/surveys/">
+        <form method="get" action="/renovations/">
             <div>
                 <button type="submit" class="red">anuluj</button>
             </div>

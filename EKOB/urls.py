@@ -21,7 +21,7 @@ from django.conf.urls.static import static
 from survey.views import AddSurveyView, AddContractorView, ShowSurveysView, UpdateSurvey, SurveyDeleteView, \
     ShowContractorsView, AddExecutionView, ReadPdfView, LoginView, logout_view, RegistrationView, ScheduleView, \
     display_survey_pdf_raport, ContractorDeleteView, AddRenovationsView, ShowRenovationsView, ShowOneRenovationView, \
-    ReadRenovationPdfView, AddContractRenovationView, AddExecutRenovationView
+    ReadRenovationPdfView, AddContractRenovationView, AddExecutRenovationView, RenovationDeleteView
 
 urlpatterns = [
                   path('admin/', admin.site.urls),
@@ -46,6 +46,7 @@ urlpatterns = [
                   path('renovations/contracts/<int:renovation_id>', AddContractRenovationView.as_view()),
                   path('renovations/execution/<int:renovation_id>', AddExecutRenovationView.as_view()),
                   path('renovations/renovation/<int:renovation_id>/<str:pdf>/', ReadRenovationPdfView.as_view()),
+                  path('renovations/delete/<int:renovation_id>', RenovationDeleteView.as_view()),
 
 
               ] + static(settings.MEDIA_URL, document_root=settings.MEDIA_ROOT)

@@ -55,6 +55,7 @@
     {% if not execution %}
             <a href="execution/{{ renovation.id}}"><button type="submit" >Dodaj realizację</button></a>
     {% endif %}
+     <a href="/renovations/delete/{{ renovation.id }}"><button type="submit" class="red" >kasuj remont</button></a>
     <div style="clear:both"></div>
     </div>
 

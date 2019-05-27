@@ -1,4 +1,5 @@
 import os
+import shutil
 
 from django.db import models
 from django.http import HttpResponseRedirect
@@ -88,14 +89,12 @@ class PdfFile(models.Model):
     pdf = models.FileField(upload_to='pdf')
 
 
-
-
 class Renovations(models.Model):
     building = models.ForeignKey(Buildings, on_delete=models.CASCADE, verbose_name="Budynek:")
     description = models.TextField(verbose_name='Zakres remontu')
 
 
-KIND_CONTRACT=(
+KIND_CONTRACT = (
     ('contract', 'Umowa'),
     ('annex', 'Aneks'),
     ('permit', 'zezwolenie')
@@ -103,22 +102,17 @@ KIND_CONTRACT=(
 )
 
 
-
 def get_upload_path(instance, filename):
     return 'renovation/{}/{}'.format(instance.renovation.id, filename)
 
 
 class ContractRenovation(models.Model):
-
     renovation = models.ForeignKey(Renovations, on_delete=models.CASCADE)
-    kind=models.CharField(choices=KIND_CONTRACT, max_length=12)
+    kind = models.CharField(choices=KIND_CONTRACT, max_length=12)
     number = models.CharField(max_length=48, null=True, verbose_name="Nr umowy")
     date = models.DateField(verbose_name="Data umowy")
     description = models.TextField(verbose_name='Przedmiot umowy/pozwolenia')
     contract_pdf = models.FileField(upload_to=get_upload_path, null=True, verbose_name="Umowa - pdf")
-
-
-
 
 
 class ExecutRenovation(models.Model):
@@ -129,5 +123,3 @@ class ExecutRenovation(models.Model):
     termination_pdf = models.FileField(upload_to=get_upload_path, null=True, verbose_name="Protokół odbioru -pdf")
     description = models.TextField(null=True, verbose_name='uwagi')
     renovation = models.OneToOneField(Renovations, on_delete=models.CASCADE, primary_key=True)
-
-

@@ -1,4 +1,5 @@
 import os
+import shutil
 from calendar import monthrange
 
 from django.contrib.auth import authenticate, login, logout
@@ -358,6 +359,19 @@ class ContractorDeleteView(View):
         if instance.pdf:
             if os.path.isfile(instance.pdf.path):
                 os.remove(instance.pdf.path)
+
+
+class RenovationDeleteView(View):
+    def get(self, request, renovation_id):
+        renovation = get_object_or_404(Renovations, id=renovation_id)
+        return render(request, "survey/renovations_confirm_delete.html", {'renovation': renovation})
+
+    def post(self, request, renovation_id):
+        if os.path.isdir('media/renovation/' + str(renovation_id)):
+            shutil.rmtree('media/renovation/' + str(renovation_id))
+        delete_renovations = Renovations.objects.get(id=renovation_id)
+        delete_renovations.delete()
+        return HttpResponseRedirect("/renovations")
 
 
 # =========================== FILES SECTION =====================
