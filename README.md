@@ -14,3 +14,6 @@ Update:19-04-2019.
 
 Update:20-05-2019.
 	add renovations section
+
+Update:30-05-2019.
+	adding photos to renovation
