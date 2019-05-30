@@ -75,6 +75,10 @@ body {
     padding-right: auto;
 }
 
+.indent_box{
+    margin-left: 30px;
+}
+
 /* ============Style the footer ==============*/
 .footer {
   background-color: #005b96;

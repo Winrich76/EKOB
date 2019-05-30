@@ -20,10 +20,12 @@ import datetime
 
 from survey.filters import SurveyFilter
 from survey.forms import AddSurveyForm, AddContractorsForm, AddExecutionForm, LoginForm, RegistrationForm, \
-    ScheduleForm, SendMailForm, SurveyForm, RenovationsForm, ContractRenovationForm, ExecutRenovationForm
+    ScheduleForm, SendMailForm, SurveyForm, RenovationsForm, ContractRenovationForm, ExecutRenovationForm, \
+    PictureRenovationForm
 from survey.functions import validity_date, length_valid, check_open_survey, read_pdf
 from survey.messages import text_message, delete_message
-from survey.models import Buildings, Survey, Contractors, Execution, Renovations, ContractRenovation, ExecutRenovation
+from survey.models import Buildings, Survey, Contractors, Execution, Renovations, ContractRenovation, ExecutRenovation, \
+    PictureRenovation
 
 from weasyprint import HTML, CSS
 
@@ -196,6 +198,20 @@ class AddExecutRenovationView(View):
             return render(request, "add_renovation.html", {"form": form, 'h2_ctx': h2_ctx})
 
 
+class AddPictureRenovationView(View):
+
+    def post(self, request):
+        form = PictureRenovationForm(request.POST, request.FILES)
+        if form.is_valid():
+            description = form.cleaned_data['description']
+            picture = form.cleaned_data['picture']
+            renovation = form.cleaned_data['renovation']
+            PictureRenovation.objects.create(description=description, picture=picture, renovation_id=renovation)
+            return HttpResponseRedirect('/renovations/' + str(renovation))
+        else:
+            return render(request, "add_renovation.html", {"form": form})
+
+
 class ShowSurveysView(LoginRequiredMixin, View):
     login_url = '/'
 
@@ -239,6 +255,7 @@ class ShowOneRenovationView(View):
 
     def get(self, request, renovation_id):
         renovation = get_object_or_404(Renovations, id=renovation_id)
+        form = PictureRenovationForm(initial={"renovation": renovation_id})
         try:
             contracts = ContractRenovation.objects.all().filter(renovation_id=renovation_id).order_by('date')
         except:
@@ -247,8 +264,13 @@ class ShowOneRenovationView(View):
             execution = ExecutRenovation.objects.get(renovation_id=renovation_id)
         except:
             execution = False
+        try:
+            pictures = len(PictureRenovation.objects.all().filter(renovation_id=renovation_id))
+        except :
+            pictures = 0
+
         return render(request, 'one_renovation.html',
-                      {"renovation": renovation, 'contracts': contracts, 'execution': execution})
+                      {"renovation": renovation, 'contracts': contracts, 'execution': execution, 'form': form, 'pictures':pictures})
 
 
 class ScheduleView(View):

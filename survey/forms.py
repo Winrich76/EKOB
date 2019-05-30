@@ -172,3 +172,11 @@ class ExecutRenovationForm(forms.Form):
         if start > termination:
             raise ValidationError("Wprowadzona data rozpoczęcia robót jest później niż data zakończenia")
         return cleaned_data
+
+
+class PictureRenovationForm(forms.Form):
+    description = forms.CharField(label="Opis", required=False,
+                                  widget=forms.Textarea(
+                                      attrs={'placeholder': 'opis zdjęcia'}))
+    picture = forms.FileField(label="zdjęcie")
+    renovation = forms.IntegerField(widget=forms.HiddenInput)

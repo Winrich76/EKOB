@@ -123,3 +123,13 @@ class ExecutRenovation(models.Model):
     termination_pdf = models.FileField(upload_to=get_upload_path, null=True, verbose_name="Protokół odbioru -pdf")
     description = models.TextField(null=True, verbose_name='uwagi')
     renovation = models.OneToOneField(Renovations, on_delete=models.CASCADE, primary_key=True)
+
+
+def get_upload_path_picture(instance, filename):
+    return 'renovation/{}/picture/{}'.format(instance.renovation.id, filename)
+
+
+class PictureRenovation(models.Model):
+    description = models.TextField(null=True)
+    picture = models.FileField(upload_to=get_upload_path_picture)
+    renovation = models.ForeignKey(Renovations, on_delete=models.CASCADE)
