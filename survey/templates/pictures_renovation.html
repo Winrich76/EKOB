@@ -1,0 +1,12 @@
+{% extends 'base-one_column.html' %}
+{% load static %}
+{% load widget_tweaks %}
+
+{% block content %}
+
+{% for picture in pictures %}
+    <img src="/media/{{ picture.picture }}">
+    <p>{{ picture.description }}</p>
+{% endfor %}
+
+{% endblock %}

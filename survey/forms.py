@@ -180,3 +180,25 @@ class PictureRenovationForm(forms.Form):
                                       attrs={'placeholder': 'opis zdjęcia'}))
     picture = forms.FileField(label="zdjęcie")
     renovation = forms.IntegerField(widget=forms.HiddenInput)
+
+
+class ProjectRenovationForm(forms.Form):
+    date = forms.DateField(label='Data:',
+                           widget=forms.SelectDateWidget(years=range((year - 10), (year + 1)),
+                                                         attrs={'class': 'formIn'}))
+    description = forms.CharField(label="Opis",
+                                  widget=forms.Textarea(
+                                      attrs={'placeholder': 'tytuł/zakres projektu lub przedmiaru robót'}))
+    project_pdf = forms.FileField(label="skan_pdf")
+    renovation = forms.IntegerField(widget=forms.HiddenInput)
+
+
+class OtherRenovationsDocForm(forms.Form):
+    date = forms.DateField(label='Data:',
+                           widget=forms.SelectDateWidget(years=range((year - 10), (year + 1)),
+                                                         attrs={'class': 'formIn'}))
+    description = forms.CharField(label="Opis",
+                                  widget=forms.Textarea(
+                                      attrs={'placeholder': 'tytuł/opis documentu'}))
+    doc_pdf = forms.FileField(label="skan_pdf")
+    renovation = forms.IntegerField(widget=forms.HiddenInput)

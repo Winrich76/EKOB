@@ -12,20 +12,20 @@ from django.dispatch import receiver
 
 from django.template.loader import render_to_string
 from django.http import HttpResponse, HttpResponseRedirect, Http404
-from django.shortcuts import render, get_object_or_404
+from django.shortcuts import render, get_object_or_404, get_list_or_404
 
 from django.views import View
-from django.views.generic import UpdateView, DeleteView
+from django.views.generic import UpdateView, DeleteView, CreateView
 import datetime
 
 from survey.filters import SurveyFilter
 from survey.forms import AddSurveyForm, AddContractorsForm, AddExecutionForm, LoginForm, RegistrationForm, \
     ScheduleForm, SendMailForm, SurveyForm, RenovationsForm, ContractRenovationForm, ExecutRenovationForm, \
-    PictureRenovationForm
+    PictureRenovationForm, ProjectRenovationForm, OtherRenovationsDocForm
 from survey.functions import validity_date, length_valid, check_open_survey, read_pdf
 from survey.messages import text_message, delete_message
 from survey.models import Buildings, Survey, Contractors, Execution, Renovations, ContractRenovation, ExecutRenovation, \
-    PictureRenovation
+    PictureRenovation, ProjectRenovation, OtherRenovationsDoc
 
 from weasyprint import HTML, CSS
 
@@ -212,6 +212,44 @@ class AddPictureRenovationView(View):
             return render(request, "add_renovation.html", {"form": form})
 
 
+class AddProjectRenovationView(View):
+    def get(self, request, renovation_id):
+        form = ProjectRenovationForm(initial={"renovation": renovation_id})
+        return render(request, 'add_renovation.html', {'form': form})
+
+    def post(self, request, renovation_id):
+        form = ProjectRenovationForm(request.POST, request.FILES)
+        if form.is_valid():
+            date = form.cleaned_data['date']
+            description = form.cleaned_data['description']
+            project_pdf = form.cleaned_data['project_pdf']
+            renovation = form.cleaned_data['renovation']
+            ProjectRenovation.objects.create(date=date, description=description, project_pdf=project_pdf,
+                                             renovation_id=renovation)
+            return HttpResponseRedirect('/renovations/' + str(renovation))
+        else:
+            return render(request, "add_renovation.html", {"form": form})
+
+
+class AddOtherRenovationDocView(View):
+    def get(self, request, renovation_id):
+        form = OtherRenovationsDocForm(initial={"renovation": renovation_id})
+        return render(request, 'add_renovation.html', {'form': form})
+
+    def post(self, request, renovation_id):
+        form = OtherRenovationsDocForm(request.POST, request.FILES)
+        if form.is_valid():
+            date = form.cleaned_data['date']
+            description = form.cleaned_data['description']
+            doc_pdf = form.cleaned_data['doc_pdf']
+            renovation = form.cleaned_data['renovation']
+            OtherRenovationsDoc.objects.create(date=date, description=description, doc_pdf=doc_pdf,
+                                             renovation_id=renovation)
+            return HttpResponseRedirect('/renovations/' + str(renovation))
+        else:
+            return render(request, "add_renovation.html", {"form": form})
+
+
 class ShowSurveysView(LoginRequiredMixin, View):
     login_url = '/'
 
@@ -266,11 +304,22 @@ class ShowOneRenovationView(View):
             execution = False
         try:
             pictures = len(PictureRenovation.objects.all().filter(renovation_id=renovation_id))
-        except :
+        except:
             pictures = 0
 
+        try:
+            projects = ProjectRenovation.objects.all().filter(renovation_id=renovation_id)
+        except:
+            projects = False
+
+        try:
+            documents = OtherRenovationsDoc.objects.all().filter(renovation_id=renovation_id)
+        except:
+            documents = False
+
         return render(request, 'one_renovation.html',
-                      {"renovation": renovation, 'contracts': contracts, 'execution': execution, 'form': form, 'pictures':pictures})
+                      {"renovation": renovation, 'contracts': contracts, 'execution': execution, 'form': form,
+                       'pictures': pictures, 'projects': projects, 'documents': documents})
 
 
 class ScheduleView(View):
@@ -336,6 +385,12 @@ class ScheduleView(View):
 
             return render(request, "schedule.html",
                           {"form": form, "surveys": surveys, "form_mail": form_mail})
+
+
+class DisplayPicturesRenovationView(View):
+    def get(self, request, renovation_id):
+        pictures = get_list_or_404(PictureRenovation, renovation_id=renovation_id)
+        return render(request, 'pictures_renovation.html', {'pictures': pictures})
 
 
 class UpdateSurvey(UpdateView):

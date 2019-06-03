@@ -22,7 +22,7 @@ from survey.views import AddSurveyView, AddContractorView, ShowSurveysView, Upda
     ShowContractorsView, AddExecutionView, ReadPdfView, LoginView, logout_view, RegistrationView, ScheduleView, \
     display_survey_pdf_raport, ContractorDeleteView, AddRenovationsView, ShowRenovationsView, ShowOneRenovationView, \
     ReadRenovationPdfView, AddContractRenovationView, AddExecutRenovationView, RenovationDeleteView, \
-    AddPictureRenovationView
+    AddPictureRenovationView, DisplayPicturesRenovationView, AddProjectRenovationView, AddOtherRenovationDocView
 
 urlpatterns = [
                   path('admin/', admin.site.urls),
@@ -48,6 +48,9 @@ urlpatterns = [
                   path('renovations/execution/<int:renovation_id>', AddExecutRenovationView.as_view()),
                   path('renovations/renovation/<int:renovation_id>/<str:pdf>/', ReadRenovationPdfView.as_view()),
                   path('renovations/delete/<int:renovation_id>', RenovationDeleteView.as_view()),
+                  path('renovations/pictures/<int:renovation_id>', DisplayPicturesRenovationView.as_view()),
+                  path('renovations/addproject/<int:renovation_id>', AddProjectRenovationView.as_view()),
+                  path('renovations/adddoc/<int:renovation_id>', AddOtherRenovationDocView.as_view()),
                   path('renovations/addpicture', AddPictureRenovationView.as_view()),
 
 

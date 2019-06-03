@@ -14,21 +14,43 @@
         <h3>Realizacja:</h3>
             <div class="indent_box">
                 {% if execution %}
-                    <p>Wykonawca: {{ execution.contractor }}</p>
-                    <p>Inspector: {{ execution.surveyor }}</p>
-                    <p>Data wprowadzenia na budowę: {{ execution.start }}</p>
-                    <p>Data odbioru robót: {{ execution.termination }}</p>
-                    <p>Uwagi: {{ execution.description }}</p>
-                    {% if execution.termination_pdf %}
-                        <p style="float: left">Protokół odbioru: </p>
-                        <p ><a href="{{ execution.termination_pdf }}"><button class="icon">PDF</button></a></p>
-                        <p style="clear:both"></p>
+                    <table>
+                        <tr>
+                            <td class="filter">Wykonawca:</td>
+                            <td class="filter">{{ execution.contractor }}</td>
+                        </tr>
+                        <tr>
+                            <td class="filter">Inspector:</td>
+                            <td class="filter">{{ execution.surveyor }}</td>
+                        </tr>
+                        <tr>
+                            <td class="filter">Data wprowadzenia na budowę:</td>
+                            <td class="filter">{{ execution.start }}</td>
+                        </tr>
+                        <tr>
+                            <td class="filter">Data odbioru robót:</td>
+                            <td class="filter">{{ execution.termination }}</td>
+                        </tr>
+                        <tr>
+                            <td class="filter">Uwagi: </td>
+                            <td class="filter">{{ execution.description }}</td>
+                        </tr>
+                        {% if execution.termination_pdf %}
+                            <tr>
+                                <td class="filter">Protokół odbioru:</td>
+                                <td class="filter"><a href="{{ execution.termination_pdf }}"><button class="icon">PDF</button></a></td>
+                            </tr>
 
-                    {% endif %}
+                        {% endif %}
+
+
+                    </table>
+
                 {% else %}<p>Nie wprowadzono danych.</p>
+                    <a href="execution/{{ renovation.id}}"><button type="submit" >Dodaj realizację</button></a>
                 {% endif %}
             </div>
-
+         <div style="clear:both"></div>
 
 
         <h3>Umowy i zezwolenia:</h3>
@@ -57,19 +79,80 @@
                     </table>
                 {% else %}<p>Nie wprowadzono danych.</p>
                 {% endif %}
+                <a href="contracts/{{ renovation.id}}"> <button type="submit" >Dodaj umowę</button></a>
             </div>
+            <div style="clear:both"></div>
 
+        <h3>Projekty i kosztorysy:</h3>
+            <div class="indent_box">
+                {% if projects %}
+                    <table>
+                        <tr>
+                            <th>Data</th>
+                            <th>Opis</th>
+                            <th>skan</th>
+                        </tr>
+                        {% for project in projects %}
+                            <tr>
+                            <td>{{ project.date }}</td>
+                            <td>{{ project.description }}</td>
+                            <td>
+                                {% if project.project_pdf %}
+                                        <a href="{{ project.project_pdf }}"><button class="icon">PDF</button></a>
+                                {% endif %}
+                            </td>
+                            </tr>
+                        {% endfor %}
+                    </table>
+                {% else %}<p>Nie wprowadzono danych.</p>
+                {% endif %}
+            <a href="addproject/{{ renovation.id}}"> <button type="submit" >Dodaj projekt</button></a>
+            </div>
+            <div style="clear:both"></div>
+
+
+        <h3>Pozostałe dokumenty:</h3>
+
+            <div class="indent_box">
+                {% if documents %}
+                    <table>
+                        <tr>
+                            <th>Data</th>
+                            <th>Opis</th>
+                            <th>skan</th>
+                        </tr>
+                        {% for document in documents %}
+                            <tr>
+                            <td>{{ document.date }}</td>
+                            <td>{{ document.description }}</td>
+                            <td>
+                                {% if document.doc_pdf %}
+                                        <a href="{{ document.doc_pdf }}"><button class="icon">PDF</button></a>
+                                {% endif %}
+                            </td>
+                            </tr>
+                        {% endfor %}
+                    </table>
+                {% else %}<p>Nie wprowadzono danych.</p>
+                {% endif %}
+                <a href="adddoc/{{ renovation.id}}"> <button type="submit" >Dodaj dokument</button></a>
+            </div>
+        <div style="clear:both"></div>
 
         <h3>Zdjęcia:</h3>
             <div class="indent_box">
                 <p>Ilość zdjęć w bazie: {{ pictures }}</p>
+
+            {% if pictures %}
+                <a href="/renovations/pictures/{{ renovation.id}}"> <button type="submit" >pokaż zdjęcia</button></a>
+                <div style="clear:both"></div>
+            {% endif %}
                 <table>
                     <tr>
                         <td class="filter">Dodaj zdjęcia</td>
                         <td class="filter"><label class="container"><input type="checkbox" id="check_add_picture" >  <span class="checkmark"></span></label></td>
                     </tr>
                 </table>
-
 
 
                 <div id="add_picture" class="invisible">
@@ -102,10 +185,6 @@
 
         <div style="clear:both"></div>
 
-            <a href="contracts/{{ renovation.id}}"> <button type="submit" >Dodaj umowę</button></a>
-            {% if not execution %}
-                    <a href="execution/{{ renovation.id}}"><button type="submit" >Dodaj realizację</button></a>
-            {% endif %}
             <a href="/renovations/delete/{{ renovation.id }}"><button type="submit" class="red" >kasuj remont</button></a>
         <div style="clear:both"></div>
     </div>

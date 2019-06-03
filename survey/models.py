@@ -133,3 +133,17 @@ class PictureRenovation(models.Model):
     description = models.TextField(null=True)
     picture = models.FileField(upload_to=get_upload_path_picture)
     renovation = models.ForeignKey(Renovations, on_delete=models.CASCADE)
+
+
+class ProjectRenovation(models.Model):
+    date = models.DateField(null=True)
+    description = models.TextField()
+    project_pdf = models.FileField(null=True, upload_to=get_upload_path)
+    renovation = models.ForeignKey(Renovations, on_delete=models.CASCADE)
+
+
+class OtherRenovationsDoc(models.Model):
+    date = models.DateField(null=True)
+    description = models.TextField()
+    doc_pdf = models.FileField(null=True, upload_to=get_upload_path)
+    renovation = models.ForeignKey(Renovations, on_delete=models.CASCADE)
