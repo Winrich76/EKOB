@@ -1,0 +1,37 @@
+{% extends 'base-one_column.html' %}
+{% load static %}
+{% load widget_tweaks %}
+
+{% block content %}
+    <div class="center_box">
+        <form action="" method="post" enctype="multipart/form-data">
+            {% csrf_token %}
+            {{ form.non_field_errors }}
+            {% for hidden_field in form.hidden_fields %}
+                {{ hidden_field.errors }}
+                {{ hidden_field }}
+            {% endfor %}
+
+          <table>
+                {% for field in form.visible_fields %}
+                  <tr>
+                      <th class="form_up">{{ field.label_tag }}</th>
+                        <td class="maxWidth">
+                            {{ field.errors }}
+                            {% render_field field  %}
+                        </td>
+                  </tr>
+                {% endfor %}
+          </table>
+
+
+            <div>
+                <button type="submit" >Zapisz</button>
+                <p style="clear:both"><br></p>
+            </div>
+
+        </form>
+    </div>
+
+{% endblock %}
+

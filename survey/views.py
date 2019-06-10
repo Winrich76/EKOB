@@ -2,6 +2,7 @@ import os
 import shutil
 from calendar import monthrange
 
+from django import forms
 from django.contrib.auth import authenticate, login, logout
 from django.contrib.auth.mixins import LoginRequiredMixin
 from django.contrib.auth.models import User
@@ -13,6 +14,7 @@ from django.dispatch import receiver
 from django.template.loader import render_to_string
 from django.http import HttpResponse, HttpResponseRedirect, Http404
 from django.shortcuts import render, get_object_or_404, get_list_or_404
+from django.urls import reverse_lazy
 
 from django.views import View
 from django.views.generic import UpdateView, DeleteView, CreateView
@@ -244,7 +246,7 @@ class AddOtherRenovationDocView(View):
             doc_pdf = form.cleaned_data['doc_pdf']
             renovation = form.cleaned_data['renovation']
             OtherRenovationsDoc.objects.create(date=date, description=description, doc_pdf=doc_pdf,
-                                             renovation_id=renovation)
+                                               renovation_id=renovation)
             return HttpResponseRedirect('/renovations/' + str(renovation))
         else:
             return render(request, "add_renovation.html", {"form": form})
@@ -406,7 +408,25 @@ class UpdateSurvey(UpdateView):
         form = super(UpdateSurvey, self).get_form(form_class)
         form.fields['description'].required = False
         form.fields['pdf'].required = False
+        return form
 
+
+class UpdateExecutionRenovation(UpdateView):
+    model = ExecutRenovation
+    fields = ['contractor', 'surveyor', 'start', 'termination', 'termination_pdf', 'description', 'renovation']
+    template_name_suffix = '_update_form'
+    pk_url_kwarg = 'renovation_id'
+
+    def get_success_url(self):
+        renovation = self.object.renovation
+        return reverse_lazy('display_renovation', kwargs={'renovation_id': renovation.id})
+
+    def get_form(self, form_class=None):
+        form = super(UpdateExecutionRenovation, self).get_form(form_class)
+        form.fields['description'].required = False
+        form.fields['surveyor'].required = False
+        form.fields['termination_pdf'].required = False
+        form.fields['renovation'].widget = forms.HiddenInput()
         return form
 
 

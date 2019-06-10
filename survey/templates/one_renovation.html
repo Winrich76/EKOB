@@ -42,10 +42,8 @@
                             </tr>
 
                         {% endif %}
-
-
                     </table>
-
+                    <a href="execution/update/{{ renovation.id}}"><button type="submit" >Modifikuj</button></a>
                 {% else %}<p>Nie wprowadzono danych.</p>
                     <a href="execution/{{ renovation.id}}"><button type="submit" >Dodaj realizację</button></a>
                 {% endif %}
