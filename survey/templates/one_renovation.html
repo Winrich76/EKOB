@@ -61,6 +61,7 @@
                             <th>Rodzaj</th>
                             <th>Przedmiot umowy</th>
                             <th>Skan</th>
+                            <th></th>
                         </tr>
                         {% for contract in contracts %}
                             <tr>
@@ -72,9 +73,16 @@
                                         <a href="{{ contract.contract_pdf }}"><button class="icon">PDF</button></a>
                                     {% endif %}
                                 </td>
+                                <form method="get" action="{% url 'contract_delete' %}">
+                                    <td><label class="container" ><input type="checkbox" name='del_contract' class="delete_contract" value="{{ contract.id }}">  <span class="checkmark"></span></label></td>
                             </tr>
                         {% endfor %}
                     </table>
+                                <button type="submit" class="red" value="{{ renovation.id }}" name="btn_del_contract">kasuj zaznaczone</button>
+                                </form>
+
+{#                    <a href="contract/delete"> <button type="submit" class="red">kasuj zaznaczone</button></a>#}
+
                 {% else %}<p>Nie wprowadzono danych.</p>
                 {% endif %}
                 <a href="contracts/{{ renovation.id}}"> <button type="submit" >Dodaj umowę</button></a>

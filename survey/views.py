@@ -471,6 +471,19 @@ class RenovationDeleteView(View):
         return HttpResponseRedirect("/renovations")
 
 
+class ContractRenovationDeleteView(View):
+    def get(self, request):
+        renovation_id = request.GET.get('btn_del_contract')
+        contracts_ids = request.GET.getlist('del_contract')
+        for contract_id in contracts_ids:
+            contract = ContractRenovation.objects.get(id=int(contract_id))
+            if contract.contract_pdf:
+                if os.path.isfile(contract.contract_pdf.path):
+                    os.remove(contract.contract_pdf.path)
+            contract.delete()
+        return HttpResponseRedirect("/renovations/{}".format(int(renovation_id)))
+
+
 # =========================== FILES SECTION =====================
 
 class ReadPdfView(View):

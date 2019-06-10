@@ -23,7 +23,7 @@ from survey.views import AddSurveyView, AddContractorView, ShowSurveysView, Upda
     display_survey_pdf_raport, ContractorDeleteView, AddRenovationsView, ShowRenovationsView, ShowOneRenovationView, \
     ReadRenovationPdfView, AddContractRenovationView, AddExecutRenovationView, RenovationDeleteView, \
     AddPictureRenovationView, DisplayPicturesRenovationView, AddProjectRenovationView, AddOtherRenovationDocView, \
-    UpdateExecutionRenovation
+    UpdateExecutionRenovation, ContractRenovationDeleteView
 
 urlpatterns = [
                   path('admin/', admin.site.urls),
@@ -55,5 +55,6 @@ urlpatterns = [
                   path('renovations/adddoc/<int:renovation_id>', AddOtherRenovationDocView.as_view()),
                   path('renovations/addpicture', AddPictureRenovationView.as_view()),
                   path('renovations/execution/update/<int:renovation_id>', UpdateExecutionRenovation.as_view()),
+                  path('renovations/contract/delete', ContractRenovationDeleteView.as_view(), name='contract_delete'),
 
               ] + static(settings.MEDIA_URL, document_root=settings.MEDIA_ROOT)
