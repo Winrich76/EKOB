@@ -476,7 +476,10 @@ class ContractRenovationDeleteView(View):
         renovation_id = request.GET.get('btn_del_contract')
         contracts_ids = request.GET.getlist('del_contract')
         for contract_id in contracts_ids:
-            contract = ContractRenovation.objects.get(id=int(contract_id))
+            try:
+                contract = ContractRenovation.objects.get(id=int(contract_id))
+            except:
+                raise Http404
             if contract.contract_pdf:
                 if os.path.isfile(contract.contract_pdf.path):
                     os.remove(contract.contract_pdf.path)
