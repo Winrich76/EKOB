@@ -133,6 +133,7 @@
                             <th>Data</th>
                             <th>Opis</th>
                             <th>skan</th>
+                            <th></th>
                         </tr>
                         {% for document in documents %}
                             <tr>
@@ -143,9 +144,16 @@
                                         <a href="{{ document.doc_pdf }}"><button class="icon">PDF</button></a>
                                 {% endif %}
                             </td>
+                            <form method="get" action="{% url 'document_delete' %}">
+                                <td><label class="container" ><input type="checkbox" name='del_document' class="delete_document" value="{{ document.id }}">  <span class="checkmark"></span></label></td>
                             </tr>
                         {% endfor %}
                     </table>
+                                 <button type="submit" class="red" value="{{ renovation.id }}" name="btn_del_document">kasuj zaznaczone</button>
+                            </form>
+
+
+
                 {% else %}<p>Nie wprowadzono danych.</p>
                 {% endif %}
                 <a href="adddoc/{{ renovation.id}}"> <button type="submit" >Dodaj dokument</button></a>

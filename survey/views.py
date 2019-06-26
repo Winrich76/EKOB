@@ -503,6 +503,22 @@ class ProjectRenovationDeleteView(View):
         return HttpResponseRedirect("/renovations/{}".format(int(renovation_id)))
 
 
+class DocumentRenovationDeleteView(View):
+    def get(self, request):
+        renovation_id = request.GET.get('btn_del_document')
+        documents_ids = request.GET.getlist('del_document')
+        for document_id in documents_ids:
+            try:
+                document = OtherRenovationsDoc.objects.get(id=int(document_id))
+            except:
+                raise Http404
+            if document.doc_pdf:
+                if os.path.isfile(document.doc_pdf.path):
+                    os.remove(document.doc_pdf.path)
+            document.delete()
+        return HttpResponseRedirect("/renovations/{}".format(int(renovation_id)))
+
+
 # =========================== FILES SECTION =====================
 
 class ReadPdfView(View):
