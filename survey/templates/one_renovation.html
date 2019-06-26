@@ -74,7 +74,7 @@
                                     {% endif %}
                                 </td>
                                 <form method="get" action="{% url 'contract_delete' %}">
-                                    <td><label class="container" ><input type="checkbox" name='del_contract' class="delete_contract" value="{{ contract.id }}">  <span class="checkmark"></span></label></td>
+                                    <td><label class="container" ><input type="checkbox" name='del_contract' class="delete_renovation_document" value="{{ contract.id }}">  <span class="checkmark"></span></label></td>
                             </tr>
                         {% endfor %}
                     </table>
@@ -109,7 +109,7 @@
                                 {% endif %}
                             </td>
                                 <form method="get" action="{% url 'project_delete' %}">
-                                <td><label class="container" ><input type="checkbox" name='del_project' class="delete_project" value="{{ project.id }}">  <span class="checkmark"></span></label></td>
+                                <td><label class="container" ><input type="checkbox" name='del_project' class="delete_renovation_document" value="{{ project.id }}">  <span class="checkmark"></span></label></td>
                             </tr>
                         {% endfor %}
                     </table>
@@ -145,7 +145,7 @@
                                 {% endif %}
                             </td>
                             <form method="get" action="{% url 'document_delete' %}">
-                                <td><label class="container" ><input type="checkbox" name='del_document' class="delete_document" value="{{ document.id }}">  <span class="checkmark"></span></label></td>
+                                <td><label class="container" ><input type="checkbox" name='del_document' class="delete_renovation_document" value="{{ document.id }}">  <span class="checkmark"></span></label></td>
                             </tr>
                         {% endfor %}
                     </table>
