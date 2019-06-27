@@ -1,7 +1,8 @@
+import os
 from calendar import monthrange
 import datetime
 
-from django.http import HttpResponse
+from django.http import HttpResponse, Http404
 
 
 def validity_date(date_s, valid):
@@ -26,13 +27,11 @@ def validity_date(date_s, valid):
     return new_date_survey
 
 
-
 def length_valid(i_kind):
     if 1 <= i_kind < 10: return 6
     if 10 <= i_kind < 20: return 12
     if 20 <= i_kind < 30: return 24
     if 50 <= i_kind < 60: return 60
-
 
 
 def check_open_survey(Object, building, kind, date_new_survey):
@@ -55,3 +54,18 @@ def read_pdf(pdf, path_dic):
         return response
     except FileNotFoundError:
         return HttpResponse('Plik {} nie istnieje'.format(pdf))
+
+
+def delete_renovation_doc(request, btn_del_doc, list_doc, records):
+    renovation_id = request.GET.get(btn_del_doc)
+    docs_ids = request.GET.getlist(list_doc)
+    for doc_id in docs_ids:
+        try:
+            record = records.objects.get(id=int(doc_id))
+        except:
+            raise Http404
+        if record.pdf_file:
+            if os.path.isfile(record.pdf_file.path):
+                os.remove(record.pdf_file.path)
+        record.delete()
+    return int(renovation_id)

@@ -112,7 +112,7 @@ class ContractRenovation(models.Model):
     number = models.CharField(max_length=48, null=True, verbose_name="Nr umowy")
     date = models.DateField(verbose_name="Data umowy")
     description = models.TextField(verbose_name='Przedmiot umowy/pozwolenia')
-    contract_pdf = models.FileField(upload_to=get_upload_path, null=True, verbose_name="Umowa - pdf")
+    pdf_file = models.FileField(upload_to=get_upload_path, null=True, verbose_name="Umowa - pdf")
 
 
 class ExecutRenovation(models.Model):
@@ -138,12 +138,12 @@ class PictureRenovation(models.Model):
 class ProjectRenovation(models.Model):
     date = models.DateField(null=True)
     description = models.TextField()
-    project_pdf = models.FileField(null=True, upload_to=get_upload_path)
+    pdf_file = models.FileField(null=True, upload_to=get_upload_path)
     renovation = models.ForeignKey(Renovations, on_delete=models.CASCADE)
 
 
 class OtherRenovationsDoc(models.Model):
     date = models.DateField(null=True)
     description = models.TextField()
-    doc_pdf = models.FileField(null=True, upload_to=get_upload_path)
+    pdf_file = models.FileField(null=True, upload_to=get_upload_path)
     renovation = models.ForeignKey(Renovations, on_delete=models.CASCADE)

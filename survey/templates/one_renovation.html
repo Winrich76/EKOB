@@ -54,32 +54,33 @@
         <h3>Umowy i zezwolenia:</h3>
             <div class="indent_box">
                 {% if contracts %}
-                    <table>
-                        <tr>
-                            <th>Nr umowy</th>
-                            <th>Data</th>
-                            <th>Rodzaj</th>
-                            <th>Przedmiot umowy</th>
-                            <th>Skan</th>
-                            <th></th>
-                        </tr>
-                        {% for contract in contracts %}
+                    <form method="get" action="{% url 'contract_delete' %}">
+                        <table>
                             <tr>
-                                <td>{{ contract.number }}</td>
-                                <td>{{ contract.date }}</td>
-                                <td>{{ contract.get_kind_display }}</td>
-                                <td>{{ contract.description }}</td>
-                                <td>{% if contract.contract_pdf %}
-                                        <a href="{{ contract.contract_pdf }}"><button class="icon">PDF</button></a>
-                                    {% endif %}
-                                </td>
-                                <form method="get" action="{% url 'contract_delete' %}">
-                                    <td><label class="container" ><input type="checkbox" name='del_contract' class="delete_renovation_document" value="{{ contract.id }}">  <span class="checkmark"></span></label></td>
+                                <th>Nr umowy</th>
+                                <th>Data</th>
+                                <th>Rodzaj</th>
+                                <th>Przedmiot umowy</th>
+                                <th>Skan</th>
+                                <th></th>
                             </tr>
-                        {% endfor %}
-                    </table>
-                                <button type="submit" class="red" value="{{ renovation.id }}" name="btn_del_contract">kasuj zaznaczone</button>
-                                </form>
+                            {% for contract in contracts %}
+                                <tr>
+                                    <td>{{ contract.number }}</td>
+                                    <td>{{ contract.date }}</td>
+                                    <td>{{ contract.get_kind_display }}</td>
+                                    <td>{{ contract.description }}</td>
+                                    <td>{% if contract.pdf_file %}
+                                            <a href="{{ contract.pdf_file }}">PLIK PDF</a>
+                                        {% endif %}
+                                    </td>
+
+                                        <td><label class="container" ><input type="checkbox" name='del_contract' class="delete_renovation_document" value="{{ contract.id }}">  <span class="checkmark"></span></label></td>
+                                </tr>
+                            {% endfor %}
+                        </table>
+                        <button type="submit" class="red" value="{{ renovation.id }}" name="btn_del_contract">kasuj zaznaczone</button>
+                    </form>
 
 
 
@@ -92,6 +93,7 @@
         <h3>Projekty i kosztorysy:</h3>
             <div class="indent_box">
                 {% if projects %}
+                    <form method="get" action="{% url 'project_delete' %}">
                     <table>
                         <tr>
                             <th>Data</th>
@@ -104,11 +106,11 @@
                             <td>{{ project.date }}</td>
                             <td>{{ project.description }}</td>
                             <td>
-                                {% if project.project_pdf %}
-                                        <a href="{{ project.project_pdf }}"><button class="icon">PDF</button></a>
+                                {% if project.pdf_file %}
+                                        <a href="{{ project.pdf_file }}">PLIK PDF</a>
                                 {% endif %}
                             </td>
-                                <form method="get" action="{% url 'project_delete' %}">
+
                                 <td><label class="container" ><input type="checkbox" name='del_project' class="delete_renovation_document" value="{{ project.id }}">  <span class="checkmark"></span></label></td>
                             </tr>
                         {% endfor %}
@@ -128,29 +130,30 @@
 
             <div class="indent_box">
                 {% if documents %}
-                    <table>
-                        <tr>
-                            <th>Data</th>
-                            <th>Opis</th>
-                            <th>skan</th>
-                            <th></th>
-                        </tr>
-                        {% for document in documents %}
+                    <form method="get" action="{% url 'document_delete' %}" >
+                        <table>
                             <tr>
-                            <td>{{ document.date }}</td>
-                            <td>{{ document.description }}</td>
-                            <td>
-                                {% if document.doc_pdf %}
-                                        <a href="{{ document.doc_pdf }}"><button class="icon">PDF</button></a>
-                                {% endif %}
-                            </td>
-                            <form method="get" action="{% url 'document_delete' %}">
-                                <td><label class="container" ><input type="checkbox" name='del_document' class="delete_renovation_document" value="{{ document.id }}">  <span class="checkmark"></span></label></td>
+                                <th>Data</th>
+                                <th>Opis</th>
+                                <th>skan</th>
+                                <th></th>
                             </tr>
-                        {% endfor %}
-                    </table>
-                                 <button type="submit" class="red" value="{{ renovation.id }}" name="btn_del_document">kasuj zaznaczone</button>
-                            </form>
+                            {% for document in documents %}
+                                <tr>
+                                <td>{{ document.date }}</td>
+                                <td>{{ document.description }}</td>
+                                <td>
+                                    {% if document.pdf_file %}
+                                            <a href="{{ document.pdf_file }}">PLIK PDF</a>
+                                    {% endif %}
+                                </td>
+
+                                    <td><label class="container" ><input type="checkbox" name='del_document' class="delete_renovation_document" value="{{ document.id }}">  <span class="checkmark"></span></label></td>
+                                </tr>
+                            {% endfor %}
+                        </table>
+                        <button type="submit" class="red" value="{{ renovation.id }}" name="btn_del_document">kasuj zaznaczone</button>
+                    </form>
 
 
 

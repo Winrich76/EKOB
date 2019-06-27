@@ -138,7 +138,7 @@ class ContractRenovationForm(forms.Form):
                                                          attrs={'class': 'formIn'}))
     description = forms.CharField(label="Przedmiot umowy/zezwolenia",
                                   widget=forms.Textarea(attrs={'placeholder': 'Przedmiot umowy/zezwolenia'}))
-    contract_pdf = forms.FileField(required=False, label="Umowa - pdf")
+    pdf_file = forms.FileField(required=False, label="Umowa - pdf")
 
     def clean(self):
         cleaned_data = self.cleaned_data
@@ -189,7 +189,7 @@ class ProjectRenovationForm(forms.Form):
     description = forms.CharField(label="Opis",
                                   widget=forms.Textarea(
                                       attrs={'placeholder': 'tytuł/zakres projektu lub przedmiaru robót'}))
-    project_pdf = forms.FileField(label="skan_pdf")
+    pdf_file = forms.FileField(required=False, label="skan_pdf")
     renovation = forms.IntegerField(widget=forms.HiddenInput)
 
 
@@ -200,5 +200,5 @@ class OtherRenovationsDocForm(forms.Form):
     description = forms.CharField(label="Opis",
                                   widget=forms.Textarea(
                                       attrs={'placeholder': 'tytuł/opis documentu'}))
-    doc_pdf = forms.FileField(label="skan_pdf")
+    pdf_file = forms.FileField(required=False, label="skan_pdf")
     renovation = forms.IntegerField(widget=forms.HiddenInput)

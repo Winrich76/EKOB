@@ -24,7 +24,7 @@ from survey.filters import SurveyFilter
 from survey.forms import AddSurveyForm, AddContractorsForm, AddExecutionForm, LoginForm, RegistrationForm, \
     ScheduleForm, SendMailForm, SurveyForm, RenovationsForm, ContractRenovationForm, ExecutRenovationForm, \
     PictureRenovationForm, ProjectRenovationForm, OtherRenovationsDocForm
-from survey.functions import validity_date, length_valid, check_open_survey, read_pdf
+from survey.functions import validity_date, length_valid, check_open_survey, read_pdf, delete_renovation_doc
 from survey.messages import text_message, delete_message
 from survey.models import Buildings, Survey, Contractors, Execution, Renovations, ContractRenovation, ExecutRenovation, \
     PictureRenovation, ProjectRenovation, OtherRenovationsDoc
@@ -159,10 +159,10 @@ class AddContractRenovationView(View):
             number = form.cleaned_data['number']
             date = form.cleaned_data['date']
             description = form.cleaned_data['description']
-            contract_pdf = form.cleaned_data['contract_pdf']
+            pdf_file = form.cleaned_data['pdf_file']
 
             ContractRenovation.objects.create(renovation_id=renovation, kind=kind, number=number, date=date,
-                                              description=description, contract_pdf=contract_pdf)
+                                              description=description, pdf_file=pdf_file)
             return HttpResponseRedirect('/renovations/' + str(renovation))
         else:
             return render(request, "add_renovation.html", {"form": form, 'h2_ctx': h2_ctx})
@@ -224,9 +224,9 @@ class AddProjectRenovationView(View):
         if form.is_valid():
             date = form.cleaned_data['date']
             description = form.cleaned_data['description']
-            project_pdf = form.cleaned_data['project_pdf']
+            pdf_file = form.cleaned_data['pdf_file']
             renovation = form.cleaned_data['renovation']
-            ProjectRenovation.objects.create(date=date, description=description, project_pdf=project_pdf,
+            ProjectRenovation.objects.create(date=date, description=description, pdf_file=pdf_file,
                                              renovation_id=renovation)
             return HttpResponseRedirect('/renovations/' + str(renovation))
         else:
@@ -243,9 +243,9 @@ class AddOtherRenovationDocView(View):
         if form.is_valid():
             date = form.cleaned_data['date']
             description = form.cleaned_data['description']
-            doc_pdf = form.cleaned_data['doc_pdf']
+            pdf_file = form.cleaned_data['pdf_file']
             renovation = form.cleaned_data['renovation']
-            OtherRenovationsDoc.objects.create(date=date, description=description, doc_pdf=doc_pdf,
+            OtherRenovationsDoc.objects.create(date=date, description=description, pdf_file=pdf_file,
                                                renovation_id=renovation)
             return HttpResponseRedirect('/renovations/' + str(renovation))
         else:
@@ -473,50 +473,23 @@ class RenovationDeleteView(View):
 
 class ContractRenovationDeleteView(View):
     def get(self, request):
-        renovation_id = request.GET.get('btn_del_contract')
-        contracts_ids = request.GET.getlist('del_contract')
-        for contract_id in contracts_ids:
-            try:
-                contract = ContractRenovation.objects.get(id=int(contract_id))
-            except:
-                raise Http404
-            if contract.contract_pdf:
-                if os.path.isfile(contract.contract_pdf.path):
-                    os.remove(contract.contract_pdf.path)
-            contract.delete()
-        return HttpResponseRedirect("/renovations/{}".format(int(renovation_id)))
+        renovation_id = delete_renovation_doc(request, btn_del_doc='btn_del_contract', list_doc='del_contract',
+                                              records=ContractRenovation)
+        return HttpResponseRedirect("/renovations/{}".format(renovation_id))
 
 
 class ProjectRenovationDeleteView(View):
     def get(self, request):
-        renovation_id = request.GET.get('btn_del_project')
-        projects_ids = request.GET.getlist('del_project')
-        for project_id in projects_ids:
-            try:
-                project = ProjectRenovation.objects.get(id=int(project_id))
-            except:
-                raise Http404
-            if project.project_pdf:
-                if os.path.isfile(project.project_pdf.path):
-                    os.remove(project.project_pdf.path)
-            project.delete()
-        return HttpResponseRedirect("/renovations/{}".format(int(renovation_id)))
+        renovation_id = delete_renovation_doc(request, btn_del_doc='btn_del_project', list_doc='del_project',
+                                              records=ProjectRenovation)
+        return HttpResponseRedirect("/renovations/{}".format(renovation_id))
 
 
 class DocumentRenovationDeleteView(View):
     def get(self, request):
-        renovation_id = request.GET.get('btn_del_document')
-        documents_ids = request.GET.getlist('del_document')
-        for document_id in documents_ids:
-            try:
-                document = OtherRenovationsDoc.objects.get(id=int(document_id))
-            except:
-                raise Http404
-            if document.doc_pdf:
-                if os.path.isfile(document.doc_pdf.path):
-                    os.remove(document.doc_pdf.path)
-            document.delete()
-        return HttpResponseRedirect("/renovations/{}".format(int(renovation_id)))
+        renovation_id = delete_renovation_doc(request, btn_del_doc='btn_del_document', list_doc='del_document',
+                                              records=OtherRenovationsDoc)
+        return HttpResponseRedirect("/renovations/{}".format(renovation_id))
 
 
 # =========================== FILES SECTION =====================
